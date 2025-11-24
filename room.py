@@ -1,8 +1,39 @@
 # Define the Room class.
 
 class Room:
+    """
 
-    # Define the constructor. 
+Cette classe représente les lieux dans le jeu. ce que j'ai ajouté
+
+Attributes :
+    name (str) : name of the room
+    description (str) : description of the room
+    exits (dict) : dictionary that contains all the maps to each rooms
+
+Methods :
+    __init__(self, name, description) : The constructor.
+    get_exit(self, direction) : Return the room 
+    get_exit_string(self) : returns a string listing all the availables get_exit_string
+    get_long_description(self) : Returns a full desription of the room 
+
+Examples :
+
+>>> forest = Room("Forest", "dans une forêt enchantée")
+>>> cave = Room("Cave", "dans une grotte sombre")
+>>> forest.exits["N"] = cave
+>>> cave.exits["S"] = forest
+>>> from player import Player
+>>> player = Player("Alice")
+>>> player.current_room = forest
+>>> player.current_room.name
+'Forest'
+>>> player.current_room.description
+'dans une forêt enchantée'
+
+"""
+
+
+ # Define the constructor. 
     def __init__(self, name, description):
         self.name = name
         self.description = description

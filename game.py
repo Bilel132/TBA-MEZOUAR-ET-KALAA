@@ -45,8 +45,8 @@ class Game:
 
         # Create exits for rooms
 
-        forest.exits = {"N" : cave, "E" : tower, "S" : castle, "O" : None}
-        tower.exits = {"N" : cottage, "E" : None, "S" : swamp, "O" : forest}
+        forest.exits = {"N" : cave, "E" : None, "S" : castle, "O" : None}
+        tower.exits = {"N" : cottage, "E" : None, "S" : None, "O" : forest}
         cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None}
         cottage.exits = {"N" : None, "E" : None, "S" : tower, "O" : cave}
         swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : castle}
@@ -65,11 +65,13 @@ class Game:
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
-        return None
-
+    
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
-
+        # Si la commande est vide on ne fait rien    ### Commande vide
+        if command_string.strip() == "":            ### Commande vide
+            return                                  ### Commande vide
+        
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
 
