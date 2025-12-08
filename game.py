@@ -25,37 +25,60 @@ class Game:
         self.commands["help"] = help
         quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["quit"] = quit
-        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O)", Actions.go, 1)
+        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O, U, D)", Actions.go, 1)
         self.commands["go"] = go
         
         # Setup rooms
 
-        forest = Room("Forest", "dans une forêt enchantée. Vous entendez une brise légère à travers la cime des arbres.")
-        self.rooms.append(forest)
-        tower = Room("Tower", "dans une immense tour en pierre qui s'élève au dessus des nuages.")
-        self.rooms.append(tower)
-        cave = Room("Cave", "dans une grotte profonde et sombre. Des voix semblent provenir des profondeurs.")
-        self.rooms.append(cave)
-        cottage = Room("Cottage", "dans un petit chalet pittoresque avec un toit de chaume. Une épaisse fumée verte sort de la cheminée.")
-        self.rooms.append(cottage)
-        swamp = Room("Swamp", "dans un marécage sombre et ténébreux. L'eau bouillonne, les abords sont vaseux.")
-        self.rooms.append(swamp)
-        castle = Room("Castle", "dans un énorme château fort avec des douves et un pont levis. Sur les tours, des flèches en or massif.")
-        self.rooms.append(castle)
+        konoha = Room("Konohagakure","dans le village caché de la Feuille, entouré d'arbres et de ninjas en entraînement.")
+        self.rooms.append(konoha)
+        suna = Room("Sunagakure","dans le village du Sable, balayé par un vent brûlant.")
+        self.rooms.append(suna)
+        kiri = Room("Kirigakure","dans le village de la Brume, noyé dans un brouillard permanent.")
+        self.rooms.append(kiri)
+        iwa = Room("Iwagakure", "dans le village de la Roche, entouré de montagnes massives.")
+        self.rooms.append(iwa)
+        kusa = Room("Kusagakure","dans le village de l'Herbe, où les champs ondulent sous la brise.")
+        self.rooms.append(kusa)
+        kumo = Room("Kumogakure","dans le village des Nuages, haut perché dans les montagnes.")
+        self.rooms.append(kumo)
+        oto = Room("Otogakure","dans le village du Son, rempli de sons étranges.")
+        self.rooms.append(oto)
+        akatsuki = Room("QG Akatsuki","dans le repaire secret de l'Akatsuki, une grotte ornée de nuages rouges.")
+        self.rooms.append(akatsuki)
+        hokage = Room("Bureau du Hokage","dans le bureau circulaire du Hokage, rempli de rouleaux confidentiels.")
+        self.rooms.append(hokage)
+        kiri_prison = Room("Prison de Kirigakure","dans un sous-sol humide où résonnent des gouttes sinistres.")
+        self.rooms.append(kiri_prison)
+        gedo = Room("Salle du Gedo Mazo","devant la statue démoniaque géante, source d'énergie sinistre.")
+        self.rooms.append(gedo)
+        suna_archive = Room("Archives de Sunagakure","dans une salle remplie de parchemins anciens et secrets.")
+        self.rooms.append(suna_archive)
+
+ 
 
         # Create exits for rooms
 
-        forest.exits = {"N" : cave, "E" : None, "S" : castle, "O" : None}
-        tower.exits = {"N" : cottage, "E" : None, "S" : None, "O" : forest}
-        cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None}
-        cottage.exits = {"N" : None, "E" : None, "S" : tower, "O" : cave}
-        swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : castle}
-        castle.exits = {"N" : forest, "E" : swamp, "S" : None, "O" : None}
+        konoha.exits = {"N": None,"E": suna,"S": iwa, "O": None,"UP": hokage,"DOWN": None}
+        suna.exits = {"N": None,"E": kiri,"S": None,"O": konoha,"UP": suna_archive,"DOWN": None}
+        kiri.exits = {"N": None,"E": None,"S": kusa,"O": suna,"UP": None,"DOWN": kiri_prison}
+        iwa.exits = {"N": konoha,"E": akatsuki,"S": None,"O": None,"UP": None,"DOWN": None}
+        kusa.exits = {"N": kiri,"E": kumo,"S": None,"O": None,"UP": None,"DOWN": None}
+        kumo.exits = {"N": None,"E": None,"S": None,"O": oto,"UP": None,"DOWN": None}
+        oto.exits = {"N": None,"E": kumo,"S": None,"O": akatsuki,"UP": None,"DOWN": None}
+        akatsuki.exits = {"N": None,"E": oto,"S": None,"O": iwa,"UP": None,"DOWN": gedo}
+        hokage.exits = {"UP": None, "DOWN": konoha}
+        kiri_prison.exits = {"UP": kiri, "DOWN": None}
+        gedo.exits = {"UP": akatsuki, "DOWN": None}
+        suna_archive.exits = {"UP": None, "DOWN": suna}
+
+
+
 
         # Setup player and starting room
 
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = swamp
+        self.player.current_room = konoha
 
     # Play the game
     def play(self):
@@ -68,9 +91,9 @@ class Game:
     
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
-        # Si la commande est vide on ne fait rien    ### Commande vide
-        if command_string.strip() == "":            ### Commande vide
-            return                                  ### Commande vide
+        # Si la commande est vide on ne fait rien
+        if command_string.strip() == "":
+            return
         
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
@@ -89,7 +112,6 @@ class Game:
     def print_welcome(self):
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
         print("Entrez 'help' si vous avez besoin d'aide.")
-        #
         print(self.player.current_room.get_long_description())
     
 

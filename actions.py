@@ -19,6 +19,13 @@ MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 class Actions:
 
     def go(game, list_of_words, number_of_parameters):
+        player = game.player
+        l = len(list_of_words)
+        # If the number of parameters is incorrect, print an error message and return False.
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG1.format(command_word=command_word))
+            return False
         """
         Move the player in the direction specified by the parameter.
         The parameter must be a cardinal direction (N, E, S, O).
@@ -45,21 +52,34 @@ class Actions:
 
         """
         
-        player = game.player
-        l = len(list_of_words)
-        # If the number of parameters is incorrect, print an error message and return False.
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG1.format(command_word=command_word))
-            return False
 
         # Get the direction from the list of words.
         direction = list_of_words[1]
+
+        Orientations={
+            "n": "N", "nord": "N", "NORD": "N", "Nord": "N", "N": "N",
+            "e": "E", "est": "E", "EST": "E", "Est": "E", "E": "E",
+            "s": "S", "sud": "S", "SUD": "S", "Sud": "S", "S": "S",
+            "o": "O", "ouest": "O", "OUEST": "O", "Ouest": "O", "O": "O",
+            "u": "UP", "up": "UP", "UP": "UP",
+            "d": "DOWN", "down": "DOWN", "DOWN": "DOWN"
+            }
+
+
         # Move the player in the direction specified by the parameter.
-        player.move(direction)
+
+        direction_input = list_of_words[1].lower()
+        if direction_input not in Orientations:
+            print("\nDirection Inconnue ! Veuillez entrer N, E, S, O, UP ou DOWN.\n")
+            return False
+        
+        
+        # Move the player in the direction specified by the parameter.
+        player.move (direction)
         return True
 
     def quit(game, list_of_words, number_of_parameters):
+        
         """
         Quit the game.
 
@@ -82,8 +102,8 @@ class Actions:
         False
         >>> quit(game, ["quit", "N", "E"], 0)
         False
-
         """
+        
         l = len(list_of_words)
         # If the number of parameters is incorrect, print an error message and return False.
         if l != number_of_parameters + 1:
