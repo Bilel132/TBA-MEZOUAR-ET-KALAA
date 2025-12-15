@@ -36,6 +36,8 @@ class Player():
         self.history = []          # Historique des salles visitées
         self.inventory = {}        # Inventaire du joueur : name -> Item
         self.max_weight = 10       # Poids max transportable
+        self.inventory = {}  # nom_item -> Item
+        self.max_weight = 10  # poids maximum que le joueur peut transporter
 
     
     # Define the move method.

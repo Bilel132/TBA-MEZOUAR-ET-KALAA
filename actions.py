@@ -184,3 +184,63 @@ class Actions:
         # Afficher l'historique après retour en arrière
         print(game.player.get_history())
         return True
+
+    def look(game, args, nb_params):
+        room = game.player.current_room
+        print(room.get_long_description())
+        print(room.get_inventory())
+
+#fonction take
+    def take(game, args, nb_params):
+        if len(args) < 2:
+            print("Précisez l'objet à prendre.")
+            return
+
+        item_name = args[1]
+        room = game.player.current_room
+
+        if item_name not in room.inventory:
+            print(f"L'objet '{item_name}' n'est pas dans la pièce.")
+            return
+
+        item = room.inventory[item_name]
+
+        # Vérifier le poids
+        current_weight = sum(i.weight for i in game.player.inventory.values())
+        if current_weight + item.weight > game.player.max_weight:
+            print(f"Vous ne pouvez pas porter '{item_name}' (poids total dépassé).")
+            return
+
+        game.player.inventory[item_name] = item
+        del room.inventory[item_name]
+        print(f"Vous avez pris l'objet '{item_name}'.")
+
+
+    def drop(game, args, nb_params):
+        if len(args) < 2:
+            print("Précisez l'objet à déposer.")
+            return
+
+        item_name = args[1]
+
+        if item_name not in game.player.inventory:
+            print(f"L'objet '{item_name}' n'est pas dans l'inventaire.")
+            return
+
+        item = game.player.inventory[item_name]
+        room = game.player.current_room
+
+        room.inventory[item_name] = item
+        del game.player.inventory[item_name]
+        print(f"Vous avez déposé l'objet '{item_name}'.")
+
+    def check(game, args, nb_params):
+        print(game.player.get_inventory())
+
+    # actions.py
+
+    def look(game, words, number_of_parameters):
+        room = game.player.current_room
+        print(f"\nVous êtes {room.description}\n")
+        print(f"Sorties: {room.get_exit_string()}\n")
+        print(room.get_inventory())

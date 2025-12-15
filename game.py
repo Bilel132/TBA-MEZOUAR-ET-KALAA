@@ -1,7 +1,7 @@
 # Description: Game class
 
 # Import modules
-
+from item import Item
 from room import Room
 from player import Player
 from command import Command
@@ -29,7 +29,15 @@ class Game:
         self.commands["go"] = go
         self.commands["history"] = Command("history", " : affiche l'historique des salles visitées", Actions.history, 0)
         self.commands["back"] = Command("back", " : revenir à la salle précédente", Actions.back, 0)
-    
+        look_cmd = Command("look", " : observer la pièce et les items présents", Actions.look, 0)
+        self.commands["look"] = look_cmd
+        take_cmd = Command("take", " <item> : prendre un item", Actions.take, 1)
+        self.commands["take"] = take_cmd
+        drop_cmd = Command("drop", " <item> : déposer un item", Actions.drop, 1)
+        self.commands["drop"] = drop_cmd
+        check_cmd = Command("check", " : vérifier l'inventaire", Actions.check, 0)
+        self.commands["check"] = check_cmd
+
 
 
         
@@ -77,6 +85,56 @@ class Game:
         gedo.exits = {"UP": akatsuki, "DOWN": None}
         suna_archive.exits = {"UP": None, "DOWN": suna}
 
+
+        # Konohagakure
+        konoha.inventory["kunai"] = Item("kunai", "couteau de ninja tranchant", 1)
+        konoha.inventory["parchment1"] = Item("parchment", "parchemin contenant des techniques secrètes", 0.5)
+        konoha.inventory["bandana"] = Item("bandana", "bandana du village de la Feuille", 0.3)
+
+        # Sunagakure
+        suna.inventory["bombe"] = Item("bombe", "petite bombe explosive", 2)
+        suna.inventory["fumigene"] = Item("fumigene", "fumigène pour créer un écran de fumée", 1)
+
+        # Kirigakure
+        kiri.inventory["bandana métallique"] = Item("métallique", "cape simple pour se protéger ou se camoufler", 1)
+        kiri.inventory["parchemin"] = Item("parchemin", "parchemin contenant des techniques secrètes", 0.5)
+
+
+        # Iwagakure
+        iwa.inventory["shuriken"] = Item("shuriken", "étoile de ninja pour attaquer à distance", 0.5)
+        iwa.inventory["parchemin"] = Item("parchemin", "parchemin contenant des techniques secrètes", 0.5)
+
+        # Kusagakure
+        kusa.inventory["herbe médicinale"] = Item("herbe médicinale", "plante pour soigner les blessures", 0.2)
+        kusa.inventory["kunai"] = Item("kunai", "couteau de ninja tranchant", 1)
+
+        # Kumogakure
+        kumo.inventory["corde"] = Item("corde", "corde pour escalader ou lier quelqu'un", 1)
+        kumo.inventory["fumigene"] = Item("fumigene", "fumigène pour créer un écran de fumée", 1)
+
+        # Otogakure
+        oto.inventory["parchemin sonore"] = Item("parchemin sonore", "parchemin contenant des techniques sonores", 0.5)
+        oto.inventory["bombe"] = Item("bombe", "petite bombe explosive", 2)
+
+        # QG Akatsuki
+        akatsuki.inventory["anneau"] = Item("anneau", "anneau mystérieux de l'Akatsuki", 0.1)
+        akatsuki.inventory["cape noire"] = Item("cape noire", "cape portée par les membres de l'Akatsuki", 1.5)
+
+        # Bureau du Hokage
+        hokage.inventory["rouleau secret"] = Item("rouleau secret", "rouleau contenant des informations confidentielles", 1)
+        hokage.inventory["sceptre"] = Item("sceptre", "sceptre officiel du Hokage", 2)
+
+        # Prison de Kirigakure
+        kiri_prison.inventory["menottes"] = Item("menottes", "pour capturer des prisonniers", 2)
+        kiri_prison.inventory["clé"] = Item("clé", "clé pour ouvrir une cellule", 0.1)
+
+        # Salle du Gedo Mazo
+        gedo.inventory["statue miniature"] = Item("statue miniature", "réplique de la statue démoniaque", 3)
+        gedo.inventory["parchemin maudit"] = Item("parchemin maudit", "parchemin contenant des malédictions", 0.5)
+
+        # Archives de Sunagakure
+        suna_archive.inventory["ancien parchemin"] = Item("ancien parchemin", "parchemin ancien contenant des techniques oubliées", 0.5)
+        suna_archive.inventory["encre spéciale"] = Item("encre spéciale", "encre pour écrire des techniques secrètes", 0.2)
 
 
 
