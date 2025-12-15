@@ -43,19 +43,22 @@ class Player():
         if not self.current_room:
             print("Vous n'êtes dans aucune salle !")
             return False
-            
-        self.history.append(self.current_room)
 
-        # Get the next room from the exits dictionary of the current room.
-        next_room = self.current_room.exits(direction)
+        direction = direction.upper()
 
-        # If the next room is None, print an error message and return False.
+        if direction not in self.current_room.exits:
+            print("\nAucune porte dans cette direction !\n")
+            return False
+
+        next_room = self.current_room.exits[direction]
+
         if next_room is None:
             print("\nAucune porte dans cette direction !\n")
             return False
 
-        # Set the current room to the next room.
+        self.history.append(self.current_room)
         self.current_room = next_room
+
         print(self.current_room.get_long_description())
         print(self.get_history())
         return True
