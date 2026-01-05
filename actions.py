@@ -239,25 +239,25 @@ class Actions:
 
     # actions.py
 
-    def look(game, words, number_of_parameters):
-        room = game.player.current_room
-        print(f"\nVous êtes {room.description}\n")
-        print(f"Sorties: {room.get_exit_string()}\n")
-        print(room.get_inventory())
+
 
     def talk(game, args, nb_params):
         if len(args) != 2:
             print("\nUsage : talk <nom_PNJ>\n")
             return False
 
-        name = args[1]
+        name = args[1].lower()
         room = game.player.current_room
         found = False
-        for char in room.characters:
-            if char.name.lower() == name.lower():
+
+        # Parcourir les objets Character dans le dictionnaire
+        for char in room.characters.values():  
+            if char.name.lower() == name:
                 print(f"\n{char.get_msg()}\n")
                 found = True
                 break
+
         if not found:
             print(f"\nAucun PNJ nommé '{name}' ici.\n")
         return found
+

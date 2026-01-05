@@ -33,11 +33,18 @@ class Character:
         """Déplace le PNJ aléatoirement dans une pièce adjacente, 50% de chances."""
         if not self.current_room.exits:
             return False
+
         if random.choice([True, False]):  # 50% de chances de bouger
             possible_rooms = [room for room in self.current_room.exits.values() if room]
             if possible_rooms:
-                self.current_room.characters.remove(self)
+                # Retirer le PNJ de l'ancienne salle
+                if self.name in self.current_room.characters:
+                    del self.current_room.characters[self.name]
+
+                # Choisir une salle adjacente
                 self.current_room = random.choice(possible_rooms)
-                self.current_room.characters.append(self)
+
+                # Ajouter le PNJ dans la nouvelle salle
+                self.current_room.characters[self.name] = self
                 return True
         return False
