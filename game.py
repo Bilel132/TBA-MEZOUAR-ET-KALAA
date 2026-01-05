@@ -189,10 +189,21 @@ class Game:
     def play(self):
         self.setup()
         self.print_welcome()
-        # Loop until the game is finished
+
         while not self.finished:
-            # Get the command from the player
-            self.process_command(input("> "))
+            #  Déplacer tous les PNJ avant que le joueur joue
+            for room in self.rooms:
+                for char in list(room.characters.values()):  # list() pour éviter problème de modification
+                    char.move()
+
+            # Afficher la salle actuelle et son inventaire
+            print(self.player.current_room.get_long_description())
+
+            #  Laisser le joueur entrer une commande
+            command_string = input("> ").strip()
+            if command_string:  # si le joueur tape quelque chose
+                self.process_command(command_string)
+
     
     # Process the command entered by the player
     def process_command(self, command_string) -> None:

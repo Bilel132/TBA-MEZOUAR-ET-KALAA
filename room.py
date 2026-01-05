@@ -68,10 +68,9 @@ Examples :
                 s += f"  - {item}\n"
         if self.characters:
             s += "\nPersonnages présents :\n"
-            for char in self.characters:
+            for char in self.characters.values():  # <-- ici le changement
                 s += f"  - {char}\n"
         return s
-
 
 
     def get_inventory(self):
