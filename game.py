@@ -6,6 +6,7 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
+from character import Character
 
 class Game:
 
@@ -37,6 +38,8 @@ class Game:
         self.commands["drop"] = drop_cmd
         check_cmd = Command("check", " : vérifier l'inventaire", Actions.check, 0)
         self.commands["check"] = check_cmd
+        talk_cmd = Command("talk", " <nom_PNJ> : parler à un personnage non joueur présent dans la salle", Actions.talk, 1)
+        self.commands["talk"] = talk_cmd
 
 
 
@@ -135,6 +138,45 @@ class Game:
         # Archives de Sunagakure
         suna_archive.inventory["ancien parchemin"] = Item("ancien parchemin", "parchemin ancien contenant des techniques oubliées", 0.5)
         suna_archive.inventory["encre spéciale"] = Item("encre spéciale", "encre pour écrire des techniques secrètes", 0.2)
+
+        # ----- PNJ pour chaque salle -----
+
+        # Konohagakure
+        naruto = Character("Naruto", "jeune ninja plein d'énergie", konoha, ["Je deviendrai Hokage !", "Salut, veux-tu t'entraîner avec moi ?"])
+        konoha.characters["naruto"] = naruto
+
+        # Sunagakure
+        gaara = Character("Gaara", "le maître du sable", suna, ["Le sable protège tout.", "Je dois rester vigilant."])
+        suna.characters["gaara"] = gaara
+
+        # Kirigakure
+        kisame = Character("Kisame", "membre de l'Akatsuki à la force redoutable", kiri, ["Le chakra est la clé de la victoire.", "Le monde est cruel."])
+        kiri.characters["kisame"] = kisame
+
+        # Iwagakure
+        onoki = Character("Onoki", "le Tsuchikage âgé mais puissant", iwa, ["La terre est mon alliée.", "Mes compétences ne faiblissent pas."])
+        iwa.characters["onoki"] = onoki
+
+        # Bureau du Hokage
+        tobirama = Character("Tobirama", "ancien Hokage et maître des techniques d'eau", hokage, ["La paix nécessite parfois des sacrifices.", "La discipline est essentielle."])
+        hokage.characters["tobirama"] = tobirama
+
+        # Kusagakure
+        tsunade = Character("Tsunade", "grande ninja médecin et leader", kusa, ["Les blessures se soignent avec soin.", "Ne sous-estime jamais un ninja médecin."])
+        kusa.characters["tsunade"] = tsunade
+
+        # Kumogakure
+        killerbee = Character("Killer Bee", "rappeur ninja et maître du bijuu", kumo, ["Yo yo yo ! Je protège le village !", "Tu veux tester tes techniques de ninja ?"])
+        kumo.characters["killerbee"] = killerbee
+
+        # Otogakure
+        ogon = Character("Ogon", "mysterieux ninja du village du Son", oto, ["Le son est mon allié.", "Chaque bruit peut être une arme."])
+        oto.characters["ogon"] = ogon
+
+        # QG Akatsuki
+        itachi = Character("Itachi", "membre légendaire de l'Akatsuki", akatsuki, ["Le sacrifice est parfois nécessaire.", "Le monde ne comprend pas toujours."])
+        akatsuki.characters["itachi"] = itachi
+
 
 
 

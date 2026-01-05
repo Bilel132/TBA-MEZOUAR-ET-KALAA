@@ -39,6 +39,8 @@ Examples :
         self.description = description
         self.exits = {}
         self.inventory = {}
+        self.characters = {} # liste des PNJ présents
+
     # Define the get_exit method.
     def get_exit(self, direction):
 
@@ -59,7 +61,18 @@ Examples :
 
     # Return a long description of this room including exits.
     def get_long_description(self):
-        return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+        s = f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+        if self.inventory:
+            s += "\nObjets dans la pièce :\n"
+            for item in self.inventory.values():
+                s += f"  - {item}\n"
+        if self.characters:
+            s += "\nPersonnages présents :\n"
+            for char in self.characters:
+                s += f"  - {char}\n"
+        return s
+
+
 
     def get_inventory(self):
         if not self.inventory:

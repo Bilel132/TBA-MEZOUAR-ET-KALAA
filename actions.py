@@ -244,3 +244,20 @@ class Actions:
         print(f"\nVous êtes {room.description}\n")
         print(f"Sorties: {room.get_exit_string()}\n")
         print(room.get_inventory())
+
+    def talk(game, args, nb_params):
+        if len(args) != 2:
+            print("\nUsage : talk <nom_PNJ>\n")
+            return False
+
+        name = args[1]
+        room = game.player.current_room
+        found = False
+        for char in room.characters:
+            if char.name.lower() == name.lower():
+                print(f"\n{char.get_msg()}\n")
+                found = True
+                break
+        if not found:
+            print(f"\nAucun PNJ nommé '{name}' ici.\n")
+        return found
