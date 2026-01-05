@@ -191,15 +191,15 @@ class Game:
         self.print_welcome()
 
         while not self.finished:
-            #  Déplacer tous les PNJ avant que le joueur joue
+            # Déplacer tous les PNJ avant que le joueur joue
             for room in self.rooms:
-                for char in list(room.characters.values()):  # list() pour éviter problème de modification
+                for char in list(room.characters.values()):  # list() pour éviter problème si un PNJ se déplace
                     char.move()
 
-            # Afficher la salle actuelle et son inventaire
+            # Afficher la salle actuelle avec objets et PNJ
             print(self.player.current_room.get_long_description())
 
-            #  Laisser le joueur entrer une commande
+            # Laisser le joueur entrer une commande
             command_string = input("> ").strip()
             if command_string:  # si le joueur tape quelque chose
                 self.process_command(command_string)

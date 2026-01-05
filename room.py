@@ -62,15 +62,21 @@ Examples :
     # Return a long description of this room including exits.
     def get_long_description(self):
         s = f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+
+        # Afficher les objets présents
         if self.inventory:
             s += "\nObjets dans la pièce :\n"
             for item in self.inventory.values():
                 s += f"  - {item}\n"
+
+        # Afficher les personnages non joueurs présents
         if self.characters:
             s += "\nPersonnages présents :\n"
-            for char in self.characters.values():  # <-- ici le changement
+            for char in self.characters.values():  # parcourt les objets Character
                 s += f"  - {char}\n"
+
         return s
+
 
 
     def get_inventory(self):
