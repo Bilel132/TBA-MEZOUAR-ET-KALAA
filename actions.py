@@ -76,6 +76,9 @@ class Actions:
         
         # Move the player in the direction specified by the parameter.
         player.move (direction)
+
+        game.quest_manager.check_quests(game, "move", player.current_room.name)
+        
         return True
 
     def quit(game, list_of_words, number_of_parameters):
@@ -215,6 +218,7 @@ class Actions:
         del room.inventory[item_name]
         print(f"Vous avez pris l'objet '{item_name}'.")
 
+        game.quest_manager.check_quests(game, "item", item_name) 
 
     def drop(game, args, nb_params):
         if len(args) < 2:
@@ -259,5 +263,7 @@ class Actions:
 
         if not found:
             print(f"\nAucun PNJ nommé '{name}' ici.\n")
+        
+        game.quest_manager.check_quests(game, "talk", name) 
         return found
 

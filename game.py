@@ -7,6 +7,7 @@ from player import Player
 from command import Command
 from actions import Actions
 from character import Character
+from quest import Quest, QuestManager
 
 class Game:
 
@@ -16,6 +17,18 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.quest_manager = QuestManager()
+    
+    def win(self):
+        """Retourne True si toutes les quêtes sont terminées"""
+        return self.quest_manager.is_completed()
+
+    def loose(self):
+    # Exemple de condition de défaite : entrer dans le QG Akatsuki sans anneau
+        if self.player.current_room.name == "QG Akatsuki" and "anneau" not in self.player.inventory:
+            return True
+        return False
+
     
     # Setup the game
     def setup(self):
@@ -185,6 +198,10 @@ class Game:
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = konoha
 
+        self.quest_manager.add_quest(Quest("Trouver le parchemin","Récupérer le parchemin secret dans Konohagakure","item","parchment1"))
+        self.quest_manager.add_quest(Quest("Visiter Sunagakure","Se rendre dans le village du Sable","move","Sunagakure"))
+        self.quest_manager.add_quest(Quest("Parler à Gaara","Interagir avec Gaara dans Sunagakure","talk","Gaara"))
+
     # Play the game
     def play(self):
         self.setup()
@@ -198,6 +215,17 @@ class Game:
 
             # Afficher la salle actuelle avec objets et PNJ
             print(self.player.current_room.get_long_description())
+
+            if self.win():
+                print("\n Mission accomplie ! Vous avez terminé toutes les quêtes et protégé les villages cachés !")
+                print("Le Hokage vous félicite pour votre bravoure et vos talents de ninja !")
+                self.finished = True
+                break
+            elif self.loose():
+                print("\n Vous avez échoué... Les villages sont en danger et l'Akatsuki a pris l'avantage !")
+                print("Réfléchissez mieux à vos actions la prochaine fois, jeune ninja.")
+                self.finished = True
+                break
 
             # Laisser le joueur entrer une commande
             command_string = input("> ").strip()
@@ -232,9 +260,11 @@ class Game:
     
 
 def main():
-    # Create a game object and play the game
-    Game().play()
-    
+    game = Game()
+    game.play()
+
 
 if __name__ == "__main__":
     main()
+
+    
