@@ -122,6 +122,20 @@ class GameGUI(tk.Tk):
         self.geometry("800x600")
         self.assets_dir = "assets/"
         
+        # Label pour l'image de bienvenue
+        self.welcome_image_label = tk.Label(self)
+        self.welcome_image_label.grid(row=1, column=4, rowspan=2, padx=5, pady=5)
+
+        # Charger l'image Konohagakure
+        image_path = os.path.join(self.assets_dir, "Konohagakure.png")
+        if os.path.exists(image_path):
+            image = Image.open(image_path).resize((300, 300))  # Ajuste la taille si besoin
+            self.welcome_photo = ImageTk.PhotoImage(image)
+            self.welcome_image_label.configure(image=self.welcome_photo)
+
+    
+
+        
 
         self.text_area = tk.Text(self, height=20, width=60, state="disabled", bg="black", fg="white")
         self.text_area.grid(row=0, column=0, rowspan=4, columnspan=4, padx=5, pady=5, sticky="nsew")
@@ -162,6 +176,10 @@ class GameGUI(tk.Tk):
             return
         self.input_entry.delete(0,"end")
         self.name_label.destroy()
+
+        #supprimer l'image de bienvenue ici
+        self.welcome_image_label.destroy()
+
         self.send_button.config(text="Envoyer", command=self.process_input)
 
         self.game = Game()
@@ -188,7 +206,7 @@ class GameGUI(tk.Tk):
         print(room.get_long_description())
 
         # Image
-        image_path = os.path.join(self.assets_dir,f"{room.name}.png")
+        image_path = os.path.join(self.assets_dir, f"{room.name}.png")
         if os.path.exists(image_path):
             image = Image.open(image_path).resize((300,300))
             self.room_image = ImageTk.PhotoImage(image)
