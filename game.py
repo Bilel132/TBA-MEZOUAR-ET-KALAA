@@ -114,61 +114,93 @@ class _StdoutRedirector:
         pass
 
 # ------------------ GUI ------------------
-
 class GameGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Jeu d'aventure")
         self.geometry("800x600")
         self.assets_dir = "assets/"
-        
-        # Label pour l'image de bienvenue
-        self.welcome_image_label = tk.Label(self)
-        self.welcome_image_label.grid(row=1, column=4, rowspan=2, padx=5, pady=5)
 
-        # Charger l'image Konohagakure
+        # ------------------ Texte ------------------
+        self.text_area = tk.Text(self, height=20, width=60, state="disabled", bg="black", fg="white")
+        self.text_area.grid(row=0, column=0, rowspan=4, columnspan=4, padx=10, pady=10, sticky="nsew")
+
+        # ------------------ Frame image bienvenue ------------------
+        self.welcome_frame = tk.Frame(self, bg="black", bd=2, relief="ridge")
+        self.welcome_frame.grid(row=1, column=4, rowspan=2, padx=10, pady=10)
+        self.welcome_image_label = tk.Label(self.welcome_frame)
+        self.welcome_image_label.pack(padx=5, pady=5)
+
+        # Charger l'image de bienvenue
         image_path = os.path.join(self.assets_dir, "Konohagakure.png")
         if os.path.exists(image_path):
-            image = Image.open(image_path).resize((300, 300))  # Ajuste la taille si besoin
+            image = Image.open(image_path).resize((300, 300))
             self.welcome_photo = ImageTk.PhotoImage(image)
             self.welcome_image_label.configure(image=self.welcome_photo)
 
-    
+        # ------------------ Frame image salle ------------------
+        self.room_frame = tk.Frame(self, bg="black", bd=2, relief="ridge")
+        self.room_frame.grid(row=0, column=4, rowspan=4, padx=10, pady=10)
+        self.image_label = tk.Label(self.room_frame)
+        self.image_label.pack(padx=5, pady=5)
 
-        
-
-        self.text_area = tk.Text(self, height=20, width=60, state="disabled", bg="black", fg="white")
-        self.text_area.grid(row=0, column=0, rowspan=4, columnspan=4, padx=5, pady=5, sticky="nsew")
-
-        self.image_label = tk.Label(self)
-        self.image_label.grid(row=0, column=4, rowspan=4, padx=5, pady=5)
-
+        # ------------------ Entrée utilisateur ------------------
         self.input_entry = tk.Entry(self, width=50)
-        self.input_entry.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
-        self.input_entry.bind("<Return>", self.process_input)
+        self.input_entry.grid(row=4, column=0, columnspan=3, padx=10, pady=5, sticky="ew")
+        self.input_entry.bind("<Return>", self.start_game)
 
-        self.send_button = tk.Button(self, text="Envoyer", command=self.process_input)
-        self.send_button.grid(row=4, column=3, padx=5, pady=5, sticky="ew")
+        self.send_button = tk.Button(self, text="Commencer", command=self.start_game)
+        self.send_button.grid(row=4, column=3, padx=10, pady=5, sticky="ew")
 
-        # Boutons de déplacement
-        def create_move_buttons(self):
-            tk.Button(self, text="N", width=4, command=lambda: (self.game.process_command("go N"), self.update_room_display())).grid(row=0, column=5)
-            tk.Button(self, text="S", width=4, command=lambda: (self.game.process_command("go S"), self.update_room_display())).grid(row=2, column=5)
-            tk.Button(self, text="E", width=4, command=lambda: (self.game.process_command("go E"), self.update_room_display())).grid(row=1, column=6)
-            tk.Button(self, text="O", width=4, command=lambda: (self.game.process_command("go O"), self.update_room_display())).grid(row=1, column=5)
+        self.name_label = tk.Label(self, text="Entrez votre nom:")
+        self.name_label.grid(row=0, column=0, columnspan=4, padx=10, pady=5)
 
-        self.input_entry = tk.Entry(self,width=50)
-        self.input_entry.grid(row=2,column=0,columnspan=3)
-        self.input_entry.bind("<Return>",self.start_game)
+    # ------------------ Début du jeu ------------------
+    def start_game(self, event=None):
+        player_name = self.input_entry.get().strip()
+        if not player_name:
+            return
+        self.input_entry.delete(0, "end")
+        self.name_label.destroy()
+        self.welcome_frame.destroy()  # Supprimer l'image de bienvenue
 
-        self.send_button = tk.Button(self,text="Commencer",command=self.start_game)
-        self.send_button.grid(row=2,column=3)
+        self.send_button.config(text="Envoyer", command=self.process_input)
 
-        self.name_label = tk.Label(self,text="Entrez votre nom:")
-        self.name_label.grid(row=0,column=0,columnspan=4)
+        self.game = Game()
+        self.game.setup(player_name)
+        sys.stdout = _StdoutRedirector(self.text_area)
 
-        self.image_label = tk.Label(self)
-        self.image_label.grid(row=1,column=4,rowspan=2)
+        self.create_move_buttons()
+        self.update_room_display()
+
+    # ------------------ Traitement des commandes ------------------
+    def process_input(self, event=None):
+        command_string = self.input_entry.get()
+        self.input_entry.delete(0, "end")
+        self.game.process_command(command_string)
+        self.update_room_display()
+
+    # ------------------ Boutons de déplacement ------------------
+    def create_move_buttons(self):
+        tk.Button(self, text="N", command=lambda: (self.game.process_command("go N"), self.update_room_display())).grid(row=0, column=5, padx=5, pady=5)
+        tk.Button(self, text="S", command=lambda: (self.game.process_command("go S"), self.update_room_display())).grid(row=2, column=5, padx=5, pady=5)
+        tk.Button(self, text="E", command=lambda: (self.game.process_command("go E"), self.update_room_display())).grid(row=1, column=6, padx=5, pady=5)
+        tk.Button(self, text="O", command=lambda: (self.game.process_command("go O"), self.update_room_display())).grid(row=1, column=4, padx=5, pady=5)
+
+    # ------------------ Mise à jour de la salle ------------------
+    def update_room_display(self):
+        room = self.game.player.current_room
+        print(room.get_long_description())
+
+        # Image de la salle
+        image_path = os.path.join(self.assets_dir, f"{room.name}.png")
+        if os.path.exists(image_path):
+            image = Image.open(image_path).resize((300, 300))
+            self.room_image = ImageTk.PhotoImage(image)
+            self.image_label.configure(image=self.room_image)
+        else:
+            self.image_label.configure(image='')
+
 
     def start_game(self,event=None):
         player_name = self.input_entry.get().strip()
