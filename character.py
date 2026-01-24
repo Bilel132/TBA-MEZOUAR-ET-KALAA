@@ -1,50 +1,26 @@
-from room import Room
 import random
 
 class Character:
-    """
-    Classe pour les personnages non joueurs (PNJ).
-
-    Attributes:
-        name (str) : nom du personnage
-        description (str) : description du personnage
-        current_room (Room) : salle où se trouve le personnage
-        msgs (list[str]) : messages que le PNJ peut dire
-    """
-    def __init__(self, name, description, current_room, msgs):
+    def __init__(self, name, description, room, msgs):
         self.name = name
         self.description = description
-        self.current_room = current_room
-        self.msgs = msgs.copy()  # copie pour garder l'original
-        self.msg_index = 0       # pour faire parler cycliquement le PNJ
+        self.current_room = room
+        self.msgs = msgs
+        self.index = 0
 
-    def __str__(self):
-        return f"{self.name} : {self.description}"
+        room.characters[self.name] = self
 
     def get_msg(self):
-        """Retourne le message suivant du PNJ cycliquement."""
-        if not self.msgs:
-            return "..."
-        msg = self.msgs[self.msg_index]
-        self.msg_index = (self.msg_index + 1) % len(self.msgs)
+        msg = self.msgs[self.index]
+        self.index = (self.index + 1) % len(self.msgs)
         return msg
 
     def move(self):
-        """Déplace le PNJ aléatoirement dans une pièce adjacente, 50% de chances."""
         if not self.current_room.exits:
-            return False
-
-        if random.choice([True, False]):  # 50% de chances de bouger
-            possible_rooms = [room for room in self.current_room.exits.values() if room]
-            if possible_rooms:
-                # Retirer le PNJ de l'ancienne salle
-                if self.name in self.current_room.characters:
-                    del self.current_room.characters[self.name]
-
-                # Choisir une salle adjacente
-                self.current_room = random.choice(possible_rooms)
-
-                # Ajouter le PNJ dans la nouvelle salle
-                self.current_room.characters[self.name] = self
-                return True
-        return False
+            return
+        
+        if random.choice([True, False]):
+            next_room = random.choice(list(self.current_room.exits.values()))
+            del self.current_room.characters[self.name]
+            self.current_room = next_room
+            self.current_room.characters[self.name] = self

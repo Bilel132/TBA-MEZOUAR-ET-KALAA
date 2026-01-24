@@ -1,346 +1,150 @@
-# Description: The actions module.
-
-# The actions module contains the functions that are called when a command is executed.
-# Each function takes 3 parameters:
-# - game: the game object
-# - list_of_words: the list of words in the command
-# - number_of_parameters: the number of parameters expected by the command
-# The functions return True if the command was executed successfully, False otherwise.
-# The functions print an error message if the number of parameters is incorrect.
-# The error message is different depending on the number of parameters expected by the command.
-
-
-# The error message is stored in the MSG0 and MSG1 variables and formatted with the command_word variable, the first word in the command.
-# The MSG0 variable is used when the command does not take any parameter.
-MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
-# The MSG1 variable is used when the command takes 1 parameter.
-MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 from item import Beamer, Potion, Scroll, Map
 
+MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
+MSG1 = "\nLa commande '{command_word}' prend 1 paramètre.\n"
 
 class Actions:
 
-    def go(game, list_of_words, number_of_parameters):
-        player = game.player
-        l = len(list_of_words)
-        # If the number of parameters is incorrect, print an error message and return False.
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG1.format(command_word=command_word))
-            return False
-        """
-        Move the player in the direction specified by the parameter.
-        The parameter must be a cardinal direction (N, E, S, O).
-
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-        Examples:
-        
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> go(game, ["go", "N"], 1)
-        True
-        >>> go(game, ["go", "N", "E"], 1)
-        False
-        >>> go(game, ["go"], 1)
-        False
-
-        """
-        
-
-        # Get the direction from the list of words.
-        direction = list_of_words[1]
-
-        Orientations={
-            "n": "N", "nord": "N", "NORD": "N", "Nord": "N", "N": "N",
-            "e": "E", "est": "E", "EST": "E", "Est": "E", "E": "E",
-            "s": "S", "sud": "S", "SUD": "S", "Sud": "S", "S": "S",
-            "o": "O", "ouest": "O", "OUEST": "O", "Ouest": "O", "O": "O",
-            "u": "UP", "up": "UP", "UP": "UP",
-            "d": "DOWN", "down": "DOWN", "DOWN": "DOWN"
-            }
-
-
-        # Move the player in the direction specified by the parameter.
-
-        direction_input = list_of_words[1].lower()
-        if direction_input not in Orientations:
-            print("\nDirection Inconnue ! Veuillez entrer N, E, S, O, UP ou DOWN.\n")
+    def go(game, words, n):
+        if len(words) != n + 1:
+            print(MSG1.format(command_word=words[0]))
             return False
         
+        directions = {
+            "n":"N","nord":"N",
+            "s":"S","sud":"S",
+            "e":"E","est":"E",
+            "o":"O","ouest":"O",
+            "up":"UP","u":"UP",
+            "down":"DOWN","d":"DOWN"
+        }
+        d = words[1].lower()
+        if d not in directions:
+            print("Direction invalide.")
+            return False
         
-        # Move the player in the direction specified by the parameter.
-        player.move (direction)
-
-        game.quest_manager.check_quests(game, "move", player.current_room.name)
-        
+        moved = game.player.move(directions[d])
+        if moved:
+            game.quest_manager.check_quests(game, "move", game.player.current_room.name)
         return True
 
-    def quit(game, list_of_words, number_of_parameters):
-        
-        """
-        Quit the game.
+    def look(game, words, n):
+        print(game.player.current_room.get_long_description())
+        return True
 
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-        Examples:
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> quit(game, ["quit"], 0)
-        True
-        >>> quit(game, ["quit", "N"], 0)
-        False
-        >>> quit(game, ["quit", "N", "E"], 0)
-        False
-        """
-        
-        l = len(list_of_words)
-        # If the number of parameters is incorrect, print an error message and return False.
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
-            return False
-        
-        # Set the finished attribute of the game object to True.
-        player = game.player
-        msg = f"\nMerci {player.name} d'avoir joué. Au revoir.\n"
-        print(msg)
+    def quit(game, words, n):
+        print("\nMerci d'avoir joué !\n")
         game.finished = True
         return True
 
-    def help(game, list_of_words, number_of_parameters):
-        """
-        Print the list of available commands.
+    def help(game, words, n):
+        print("\nCommandes disponibles:")
+        for cmd in game.commands.values():
+            print(f" - {cmd.command_word}{cmd.help_string}")
+        return True
+
+    def take(game, words, n):
+        if len(words) != 2:
+            return False
+        item = words[1]
+        room = game.player.current_room
         
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-        Examples:
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> help(game, ["help"], 0)
-        True
-        >>> help(game, ["help", "N"], 0)
-        False
-        >>> help(game, ["help", "N", "E"], 0)
-        False
-
-        """
-
-        # If the number of parameters is incorrect, print an error message and return False.
-        l = len(list_of_words)
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
+        if item not in room.inventory:
+            print("Objet introuvable.")
             return False
         
-        # Print the list of available commands.
-        print("\nVoici les commandes disponibles:")
-        for command in game.commands.values():
-            print("\t- " + str(command))
-        print()
-        return True
-    
-    def history(game, list_of_words, number_of_parameters):
-    # Vérification du nombre de paramètres
-        if len(list_of_words) != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
+        obj = room.inventory[item]
+        if game.player.current_weight() + obj.weight > game.player.max_weight:
+            print("Trop lourd.")
             return False
-
-    # Affichage de l'historique
-        print(game.player.get_history())
+        
+        game.player.inventory[item] = obj
+        del room.inventory[item]
+        print(f"{item} pris.")
+        game.quest_manager.check_quests(game, "item", item)
         return True
 
-    def back(game, list_of_words, number_of_parameters):
-        if len(list_of_words) != number_of_parameters + 1:
-            print(MSG0.format(command_word=list_of_words[0]))
+    def drop(game, words, n):
+        if len(words) != 2:
             return False
+        item = words[1]
 
-        if not game.player.history:
-            print("\nImpossible de revenir en arrière, aucune salle précédente.\n")
+        if item not in game.player.inventory:
+            print("Objet non possédé.")
             return False
-
-        previous_room = game.player.history.pop()
-        game.player.current_room = previous_room
-        print(game.player.current_room.get_long_description())
-        # Afficher l'historique après retour en arrière
-        print(game.player.get_history())
+        
+        game.player.current_room.inventory[item] = game.player.inventory[item]
+        del game.player.inventory[item]
+        print(f"{item} déposé.")
         return True
 
-    def look(game, args, nb_params):
-        room = game.player.current_room
-        print(room.get_long_description())
-        print(room.get_inventory())
-
-#fonction take
-    def take(game, args, nb_params):
-        if len(args) < 2:
-            print("Précisez l'objet à prendre.")
-            return
-
-        item_name = args[1]
-        room = game.player.current_room
-
-        if item_name not in room.inventory:
-            print(f"L'objet '{item_name}' n'est pas dans la pièce.")
-            return
-
-        item = room.inventory[item_name]
-
-        # Vérifier le poids
-        current_weight = sum(i.weight for i in game.player.inventory.values())
-        if current_weight + item.weight > game.player.max_weight:
-            print(f"Vous ne pouvez pas porter '{item_name}' (poids total dépassé).")
-            return
-
-        game.player.inventory[item_name] = item
-        del room.inventory[item_name]
-        print(f"Vous avez pris l'objet '{item_name}'.")
-
-        game.quest_manager.check_quests(game, "item", item_name) 
-
-    def drop(game, args, nb_params):
-        if len(args) < 2:
-            print("Précisez l'objet à déposer.")
-            return
-
-        item_name = args[1]
-
-        if item_name not in game.player.inventory:
-            print(f"L'objet '{item_name}' n'est pas dans l'inventaire.")
-            return
-
-        item = game.player.inventory[item_name]
-        room = game.player.current_room
-
-        room.inventory[item_name] = item
-        del game.player.inventory[item_name]
-        print(f"Vous avez déposé l'objet '{item_name}'.")
-
-    def check(game, args, nb_params):
+    def check(game, words, n):
         print(game.player.get_inventory())
+        return True
 
-    # actions.py
-
-
-
-    def talk(game, args, nb_params):
-        if len(args) != 2:
-            print("\nUsage : talk <nom_PNJ>\n")
+    def talk(game, words, n):
+        if len(words) != 2:
             return False
-
-        name = args[1].lower()
-        room = game.player.current_room
-        found = False
-
-        for char in room.characters.values():
-            if char.name.lower() == name:
-                print(f"\n{char.get_msg()}\n")  # juste le message du PNJ
-                # Vérifier les quêtes avec le nom exact
-                game.quest_manager.check_quests(game, "talk", char.name)
-                found = True
-                break
-
-        if not found:
-            print(f"\nAucun PNJ nommé '{args[1]}' ici.\n")
         
-        return found
-
-
-    def charge(game, args, nb_params):
-        for item in game.player.inventory.values():
-            if isinstance(item, Beamer):
-                item.charge(game.player)
+        name = words[1].lower()
+        room = game.player.current_room
+        
+        for c in room.characters.values():
+            if c.name.lower() == name:
+                print(c.get_msg())
+                game.quest_manager.check_quests(game, "talk", c.name)
                 return True
-        print("Vous n'avez pas de Beamer dans votre inventaire.")
+        
+        print("PNJ introuvable.")
         return False
 
-    def fire(game, args, nb_params):
-        for item in game.player.inventory.values():
-            if isinstance(item, Beamer):
-                item.fire(game.player)
-                return True
-        print("Vous n'avez pas de Beamer dans votre inventaire.")
-        return False
-
-
-    def use(game, args, nb_params):
-        if len(args) < 2:
-            print("Précisez l'objet à utiliser.")
+    def use(game, words, n):
+        if len(words) != 2:
             return False
-
-        item_name = args[1]
-        player = game.player
-
-        if item_name not in player.inventory:
-            print(f"L'objet '{item_name}' n'est pas dans votre inventaire.")
+        
+        name = words[1]
+        if name not in game.player.inventory:
+            print("Objet absent.")
             return False
-
-        item = player.inventory[item_name]
-
-        if isinstance(item, Potion):
-            item.use(player)
-            del player.inventory[item_name]  # potion consommée
+        
+        obj = game.player.inventory[name]
+        if hasattr(obj, "use"):
+            obj.use(game.player, game)
+            if isinstance(obj, Potion):
+                del game.player.inventory[name]
             return True
-        elif isinstance(item, Key):
-            # Ici on pourrait vérifier Door.locked si on ajoute la classe Door
-            print(f"Vous tenez la clé '{item_name}', elle peut ouvrir une porte verrouillée.")
-            return True
-        else:
-            print("Impossible d'utiliser cet objet pour le moment.")
-            return False
-
-
-
-    def read(game, args, nb_params):
-        if len(args) < 2:
-            print("Précisez le parchemin à lire.")
-            return False
-        name = args[1]
-        if name in game.player.inventory:
-            item = game.player.inventory[name]
-            if isinstance(item, Scroll):
-                item.read()
-                return True
-            else:
-                print(f"{name} n'est pas un parchemin.")
-                return False
-        else:
-            print(f"Vous n'avez pas {name} dans votre inventaire.")
-            return False
-
-
-    def map(game, args, nb_params):
-        for item in game.player.inventory.values():
-            if isinstance(item, Map):
-                item.show_map(game)
-                return True
-        print("Vous n'avez pas de carte.")
+        
+        print("Impossible d'utiliser.")
         return False
 
+    def charge(game, words, n):
+        for obj in game.player.inventory.values():
+            if isinstance(obj, Beamer):
+                obj.charge(game.player)
+                return True
+        print("Aucun Beamer.")
+        return False
 
-    
-    
+    def fire(game, words, n):
+        for obj in game.player.inventory.values():
+            if isinstance(obj, Beamer):
+                obj.fire(game.player)
+                return True
+        print("Aucun Beamer.")
+        return False
+
+    def read(game, words, n):
+        name = words[1]
+        if name in game.player.inventory and isinstance(game.player.inventory[name], Scroll):
+            game.player.inventory[name].use(game.player)
+            return True
+        print("Pas un parchemin.")
+        return False
+
+    def map(game, words, n):
+        for obj in game.player.inventory.values():
+            if isinstance(obj, Map):
+                obj.use(game.player, game)
+                return True
+        print("Aucune carte.")
+        return False

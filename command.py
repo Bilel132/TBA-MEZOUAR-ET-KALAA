@@ -1,45 +1,43 @@
-# This file contains the Command class.
+# ------------------ COMMAND ------------------
+"""
+Fichier : command.py
+Description : Définit la classe Command pour représenter une commande du jeu.
+"""
 
 class Command:
     """
-    This class represents a command. A command is composed of a command word, a help string, an action and a number of parameters.
+    Cette classe représente une commande. Une commande est composée d'un mot-clé, d'une aide,
+    d'une action à exécuter et du nombre de paramètres attendus.
 
     Attributes:
-        command_word (str): The command word.
-        help_string (str): The help string.
-        action (function): The action to execute when the command is called.
-        number_of_parameters (int): The number of parameters expected by the command.
+        command_word (str): Le mot de la commande.
+        help_string (str): La chaîne d'aide affichée pour la commande.
+        action (function): La fonction à exécuter lors de l'appel de la commande.
+        number_of_parameters (int): Le nombre de paramètres attendus.
 
     Methods:
-        __init__(self, command_word, help_string, action, number_of_parameters) : The constructor.
-        __str__(self) : The string representation of the command.
-
-    Examples:
-
-    >>> from actions import go
-    >>> command = Command("go", "Permet de se déplacer dans une direction.", go, 1)
-    >>> command.command_word
-    'go'
-    >>> command.help_string
-    'Permet de se déplacer dans une direction.'
-    >>> type(command.action)
-    <class 'function'>
-    >>> command.number_of_parameters
-    1
-
+        __init__(self, command_word, help_string, action, number_of_parameters): Constructeur.
+        __str__(self): Représentation textuelle de la commande.
     """
 
-    # The constructor.
     def __init__(self, command_word, help_string, action, number_of_parameters):
+        """
+        Initialise une nouvelle commande.
+
+        Args:
+            command_word (str): mot de la commande
+            help_string (str): description de la commande
+            action (function): fonction à exécuter
+            number_of_parameters (int): nombre de paramètres attendus
+        """
         self.command_word = command_word
         self.help_string = help_string
         self.action = action
         self.number_of_parameters = number_of_parameters
-    
-    # The string representation of the command.
+
     def __str__(self):
-        return  self.command_word \
-                + self.help_string
-    
-
-
+        """
+        Retourne une représentation textuelle de la commande.
+        Exemple : "go : Permet de se déplacer dans une direction."
+        """
+        return f"{self.command_word} : {self.help_string}"
