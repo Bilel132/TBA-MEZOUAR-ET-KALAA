@@ -38,7 +38,7 @@ class Player():
         self.max_weight = 10       # Poids max transportable
         self.inventory = {}  # nom_item -> Item
         self.max_weight = 10  # poids maximum que le joueur peut transporter
-
+        self.health = 100
     
     # Define the move method.
     def move(self, direction):

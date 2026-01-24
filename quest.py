@@ -56,5 +56,5 @@ class QuestManager:
 
     def list_quests(self):
         for quest in self.quests:
-            status = "✅" if quest.completed else "❌"
+            status = "MISSION ACCOMPLIE" if quest.completed else "MISSION ECHOUE"
             print(f"{quest.name} - {status}: {quest.description}")

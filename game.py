@@ -1,94 +1,72 @@
-# Description: Game class
-
+# game.py
 # Import modules
-from item import Item
 from room import Room
 from player import Player
 from command import Command
 from actions import Actions
 from character import Character
 from quest import Quest, QuestManager
+from item import Item, Beamer, Potion, Scroll, Map, Key, Torch
+
+import tkinter as tk
+from PIL import Image, ImageTk
+import sys
+import os
+
+# ------------------ GAME CLASS ------------------
 
 class Game:
-
-    # Constructor
     def __init__(self):
         self.finished = False
         self.rooms = []
         self.commands = {}
         self.player = None
         self.quest_manager = QuestManager()
-    
+
     def win(self):
-        """Retourne True si toutes les quêtes sont terminées"""
         return self.quest_manager.is_completed()
 
     def loose(self):
-    # Exemple de condition de défaite : entrer dans le QG Akatsuki sans anneau
         if self.player.current_room.name == "QG Akatsuki" and "anneau" not in self.player.inventory:
             return True
         return False
 
-    
-    # Setup the game
-    def setup(self):
-
-        # Setup commands
-
-        help = Command("help", " : afficher cette aide", Actions.help, 0)
-        self.commands["help"] = help
-        quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
-        self.commands["quit"] = quit
-        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O, U, D)", Actions.go, 1)
-        self.commands["go"] = go
-        self.commands["history"] = Command("history", " : affiche l'historique des salles visitées", Actions.history, 0)
+    def setup(self, player_name):
+        # --- Commands ---
+        self.commands["help"] = Command("help", " : afficher cette aide", Actions.help, 0)
+        self.commands["quit"] = Command("quit", " : quitter le jeu", Actions.quit, 0)
+        self.commands["go"] = Command("go", " <direction> : se déplacer", Actions.go, 1)
+        self.commands["history"] = Command("history", " : afficher l'historique", Actions.history, 0)
         self.commands["back"] = Command("back", " : revenir à la salle précédente", Actions.back, 0)
-        look_cmd = Command("look", " : observer la pièce et les items présents", Actions.look, 0)
-        self.commands["look"] = look_cmd
-        take_cmd = Command("take", " <item> : prendre un item", Actions.take, 1)
-        self.commands["take"] = take_cmd
-        drop_cmd = Command("drop", " <item> : déposer un item", Actions.drop, 1)
-        self.commands["drop"] = drop_cmd
-        check_cmd = Command("check", " : vérifier l'inventaire", Actions.check, 0)
-        self.commands["check"] = check_cmd
-        talk_cmd = Command("talk", " <nom_PNJ> : parler à un personnage non joueur présent dans la salle", Actions.talk, 1)
-        self.commands["talk"] = talk_cmd
+        self.commands["look"] = Command("look", " : observer la pièce", Actions.look, 0)
+        self.commands["take"] = Command("take", " <item> : prendre un objet", Actions.take, 1)
+        self.commands["drop"] = Command("drop", " <item> : déposer un objet", Actions.drop, 1)
+        self.commands["check"] = Command("check", " : vérifier l'inventaire", Actions.check, 0)
+        self.commands["talk"] = Command("talk", " <PNJ> : parler à un PNJ", Actions.talk, 1)
+        self.commands["charge"] = Command("charge", " : mémoriser la salle avec Beamer", Actions.charge, 0)
+        self.commands["fire"] = Command("fire", " : téléporter avec Beamer", Actions.fire, 0)
+        self.commands["use"] = Command("use", " <item> : utiliser un objet", Actions.use, 1)
+        self.commands["read"] = Command("read", " <item> : lire un parchemin", Actions.read, 1)
+        self.commands["map"] = Command("map", " : afficher la carte", Actions.map, 0)
 
-
-
-        
-        # Setup rooms
-
-        konoha = Room("Konohagakure","dans le village caché de la Feuille, entouré d'arbres et de ninjas en entraînement.")
-        self.rooms.append(konoha)
-        suna = Room("Sunagakure","dans le village du Sable, balayé par un vent brûlant.")
-        self.rooms.append(suna)
-        kiri = Room("Kirigakure","dans le village de la Brume, noyé dans un brouillard permanent.")
-        self.rooms.append(kiri)
+        # --- Rooms ---
+        konoha = Room("Konohagakure", "dans le village caché de la Feuille, entouré d'arbres et de ninjas.")
+        suna = Room("Sunagakure", "dans le village du Sable, balayé par un vent brûlant.")
+        kiri = Room("Kirigakure", "dans le village de la Brume, noyé dans un brouillard permanent.")
         iwa = Room("Iwagakure", "dans le village de la Roche, entouré de montagnes massives.")
-        self.rooms.append(iwa)
-        kusa = Room("Kusagakure","dans le village de l'Herbe, où les champs ondulent sous la brise.")
-        self.rooms.append(kusa)
-        kumo = Room("Kumogakure","dans le village des Nuages, haut perché dans les montagnes.")
-        self.rooms.append(kumo)
-        oto = Room("Otogakure","dans le village du Son, rempli de sons étranges.")
-        self.rooms.append(oto)
-        akatsuki = Room("QG Akatsuki","dans le repaire secret de l'Akatsuki, une grotte ornée de nuages rouges.")
-        self.rooms.append(akatsuki)
-        hokage = Room("Bureau du Hokage","dans le bureau circulaire du Hokage, rempli de rouleaux confidentiels.")
-        self.rooms.append(hokage)
-        kiri_prison = Room("Prison de Kirigakure","dans un sous-sol humide où résonnent des gouttes sinistres.")
-        self.rooms.append(kiri_prison)
-        gedo = Room("Salle du Gedo Mazo","devant la statue démoniaque géante, source d'énergie sinistre.")
-        self.rooms.append(gedo)
-        suna_archive = Room("Archives de Sunagakure","dans une salle remplie de parchemins anciens et secrets.")
-        self.rooms.append(suna_archive)
+        kusa = Room("Kusagakure", "dans le village de l'Herbe, où les champs ondulent sous la brise.")
+        kumo = Room("Kumogakure", "dans le village des Nuages, haut perché dans les montagnes.")
+        oto = Room("Otogakure", "dans le village du Son, rempli de sons étranges.")
+        akatsuki = Room("QG Akatsuki", "dans le repaire secret de l'Akatsuki, une grotte ornée de nuages rouges.")
+        hokage = Room("Bureau du Hokage", "dans le bureau circulaire du Hokage, rempli de rouleaux confidentiels.")
+        kiri_prison = Room("Prison de Kirigakure", "dans un sous-sol humide où résonnent des gouttes sinistres.")
+        gedo = Room("Salle du Gedo Mazo", "devant la statue démoniaque géante, source d'énergie sinistre.")
+        suna_archive = Room("Archives de Sunagakure", "dans une salle remplie de parchemins anciens et secrets.")
 
- 
+        self.rooms.extend([konoha,suna,kiri,iwa,kusa,kumo,oto,akatsuki,hokage,kiri_prison,gedo,suna_archive])
 
-        # Create exits for rooms
-
-        konoha.exits = {"N": None,"E": suna,"S": iwa, "O": None,"UP": hokage,"DOWN": None}
+        # --- Exits ---
+        konoha.exits = {"N": None,"E": suna,"S": iwa,"O": None,"UP": hokage,"DOWN": None}
         suna.exits = {"N": None,"E": kiri,"S": None,"O": konoha,"UP": suna_archive,"DOWN": None}
         kiri.exits = {"N": None,"E": None,"S": kusa,"O": suna,"UP": None,"DOWN": kiri_prison}
         iwa.exits = {"N": konoha,"E": akatsuki,"S": None,"O": None,"UP": None,"DOWN": None}
@@ -96,175 +74,130 @@ class Game:
         kumo.exits = {"N": None,"E": None,"S": None,"O": oto,"UP": None,"DOWN": None}
         oto.exits = {"N": None,"E": kumo,"S": None,"O": akatsuki,"UP": None,"DOWN": None}
         akatsuki.exits = {"N": None,"E": oto,"S": None,"O": iwa,"UP": None,"DOWN": gedo}
-        hokage.exits = {"UP": None, "DOWN": konoha}
-        kiri_prison.exits = {"UP": kiri, "DOWN": None}
-        gedo.exits = {"UP": akatsuki, "DOWN": None}
-        suna_archive.exits = {"UP": None, "DOWN": suna}
+        hokage.exits = {"UP": None,"DOWN": konoha}
+        kiri_prison.exits = {"UP": kiri,"DOWN": None}
+        gedo.exits = {"UP": akatsuki,"DOWN": None}
+        suna_archive.exits = {"UP": None,"DOWN": suna}
 
-
-        # Konohagakure
-        konoha.inventory["kunai"] = Item("kunai", "couteau de ninja tranchant", 1)
-        konoha.inventory["parchment1"] = Item("parchment", "parchemin contenant des techniques secrètes", 0.5)
-        konoha.inventory["bandana"] = Item("bandana", "bandana du village de la Feuille", 0.3)
-
-        # Sunagakure
-        suna.inventory["bombe"] = Item("bombe", "petite bombe explosive", 2)
-        suna.inventory["fumigene"] = Item("fumigene", "fumigène pour créer un écran de fumée", 1)
-
-        # Kirigakure
-        kiri.inventory["bandana métallique"] = Item("métallique", "cape simple pour se protéger ou se camoufler", 1)
-        kiri.inventory["parchemin"] = Item("parchemin", "parchemin contenant des techniques secrètes", 0.5)
-
-
-        # Iwagakure
-        iwa.inventory["shuriken"] = Item("shuriken", "étoile de ninja pour attaquer à distance", 0.5)
-        iwa.inventory["parchemin"] = Item("parchemin", "parchemin contenant des techniques secrètes", 0.5)
-
-        # Kusagakure
-        kusa.inventory["herbe médicinale"] = Item("herbe médicinale", "plante pour soigner les blessures", 0.2)
-        kusa.inventory["kunai"] = Item("kunai", "couteau de ninja tranchant", 1)
-
-        # Kumogakure
-        kumo.inventory["corde"] = Item("corde", "corde pour escalader ou lier quelqu'un", 1)
-        kumo.inventory["fumigene"] = Item("fumigene", "fumigène pour créer un écran de fumée", 1)
-
-        # Otogakure
-        oto.inventory["parchemin sonore"] = Item("parchemin sonore", "parchemin contenant des techniques sonores", 0.5)
-        oto.inventory["bombe"] = Item("bombe", "petite bombe explosive", 2)
-
-        # QG Akatsuki
-        akatsuki.inventory["anneau"] = Item("anneau", "anneau mystérieux de l'Akatsuki", 0.1)
-        akatsuki.inventory["cape noire"] = Item("cape noire", "cape portée par les membres de l'Akatsuki", 1.5)
-
-        # Bureau du Hokage
-        hokage.inventory["rouleau secret"] = Item("rouleau secret", "rouleau contenant des informations confidentielles", 1)
-        hokage.inventory["sceptre"] = Item("sceptre", "sceptre officiel du Hokage", 2)
-
-        # Prison de Kirigakure
-        kiri_prison.inventory["menottes"] = Item("menottes", "pour capturer des prisonniers", 2)
-        kiri_prison.inventory["clé"] = Item("clé", "clé pour ouvrir une cellule", 0.1)
-
-        # Salle du Gedo Mazo
-        gedo.inventory["statue miniature"] = Item("statue miniature", "réplique de la statue démoniaque", 3)
-        gedo.inventory["parchemin maudit"] = Item("parchemin maudit", "parchemin contenant des malédictions", 0.5)
-
-        # Archives de Sunagakure
-        suna_archive.inventory["ancien parchemin"] = Item("ancien parchemin", "parchemin ancien contenant des techniques oubliées", 0.5)
-        suna_archive.inventory["encre spéciale"] = Item("encre spéciale", "encre pour écrire des techniques secrètes", 0.2)
-
-        # ----- PNJ pour chaque salle -----
-
-        # Konohagakure
-        naruto = Character("Naruto", "jeune ninja plein d'énergie", konoha, ["Je deviendrai Hokage !", "Salut, veux-tu t'entraîner avec moi ?"])
-        konoha.characters["naruto"] = naruto
-
-        # Sunagakure
-        gaara = Character("Gaara", "le maître du sable", suna, ["Le sable protège tout.", "Je dois rester vigilant."])
-        suna.characters["gaara"] = gaara
-
-        # Kirigakure
-        kisame = Character("Kisame", "membre de l'Akatsuki à la force redoutable", kiri, ["Le chakra est la clé de la victoire.", "Le monde est cruel."])
-        kiri.characters["kisame"] = kisame
-
-        # Iwagakure
-        onoki = Character("Onoki", "le Tsuchikage âgé mais puissant", iwa, ["La terre est mon alliée.", "Mes compétences ne faiblissent pas."])
-        iwa.characters["onoki"] = onoki
-
-        # Bureau du Hokage
-        tobirama = Character("Tobirama", "ancien Hokage et maître des techniques d'eau", hokage, ["La paix nécessite parfois des sacrifices.", "La discipline est essentielle."])
-        hokage.characters["tobirama"] = tobirama
-
-        # Kusagakure
-        tsunade = Character("Tsunade", "grande ninja médecin et leader", kusa, ["Les blessures se soignent avec soin.", "Ne sous-estime jamais un ninja médecin."])
-        kusa.characters["tsunade"] = tsunade
-
-        # Kumogakure
-        killerbee = Character("Killer Bee", "rappeur ninja et maître du bijuu", kumo, ["Yo yo yo ! Je protège le village !", "Tu veux tester tes techniques de ninja ?"])
-        kumo.characters["killerbee"] = killerbee
-
-        # Otogakure
-        ogon = Character("Ogon", "mysterieux ninja du village du Son", oto, ["Le son est mon allié.", "Chaque bruit peut être une arme."])
-        oto.characters["ogon"] = ogon
-
-        # QG Akatsuki
-        itachi = Character("Itachi", "membre légendaire de l'Akatsuki", akatsuki, ["Le sacrifice est parfois nécessaire.", "Le monde ne comprend pas toujours."])
-        akatsuki.characters["itachi"] = itachi
-
-
-
-
-        # Setup player and starting room
-
-        self.player = Player(input("\nEntrez votre nom: "))
+        # --- Player ---
+        self.player = Player(player_name)
         self.player.current_room = konoha
 
-        self.quest_manager.add_quest(Quest("Trouver le parchemin","Récupérer le parchemin secret dans Konohagakure","item","parchment1"))
-        self.quest_manager.add_quest(Quest("Visiter Sunagakure","Se rendre dans le village du Sable","move","Sunagakure"))
-        self.quest_manager.add_quest(Quest("Parler à Gaara","Interagir avec Gaara dans Sunagakure","talk","Gaara"))
+        # --- Quests ---
+        self.quest_manager.add_quest(Quest("Trouver le parchemin", "Récupérer le parchemin secret", ["item:parchment1"], ["XP"]))
+        self.quest_manager.add_quest(Quest("Visiter Sunagakure", "Se rendre dans le village du Sable", ["move:Sunagakure"], ["XP"]))
+        self.quest_manager.add_quest(Quest("Parler à Gaara", "Interagir avec Gaara", ["talk:Gaara"], ["XP"]))
 
-    # Play the game
-    def play(self):
-        self.setup()
-        self.print_welcome()
-
-        while not self.finished:
-            # Déplacer tous les PNJ avant que le joueur joue
-            for room in self.rooms:
-                for char in list(room.characters.values()):  # list() pour éviter problème si un PNJ se déplace
-                    char.move()
-
-            # Afficher la salle actuelle avec objets et PNJ
-            print(self.player.current_room.get_long_description())
-
-            if self.win():
-                print("\n Mission accomplie ! Vous avez terminé toutes les quêtes et protégé les villages cachés !")
-                print("Le Hokage vous félicite pour votre bravoure et vos talents de ninja !")
-                self.finished = True
-                break
-            elif self.loose():
-                print("\n Vous avez échoué... Les villages sont en danger et l'Akatsuki a pris l'avantage !")
-                print("Réfléchissez mieux à vos actions la prochaine fois, jeune ninja.")
-                self.finished = True
-                break
-
-            # Laisser le joueur entrer une commande
-            command_string = input("> ").strip()
-            if command_string:  # si le joueur tape quelque chose
-                self.process_command(command_string)
-
-    
-    # Process the command entered by the player
-    def process_command(self, command_string) -> None:
-        # Si la commande est vide on ne fait rien
-        if command_string.strip() == "":
+    # --- Command processing ---
+    def process_command(self, command_string):
+        if not command_string.strip():
             return
-        
-        # Split the command string into a list of words
-        list_of_words = command_string.split(" ")
-
-        command_word = list_of_words[0]
-
-        # If the command is not recognized, print an error message
-        if command_word not in self.commands.keys():
-            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
-        # If the command is recognized, execute it
+        words = command_string.split()
+        command_word = words[0]
+        if command_word not in self.commands:
+            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help'.\n")
         else:
             command = self.commands[command_word]
-            command.action(self, list_of_words, command.number_of_parameters)
+            command.action(self, words, command.number_of_parameters)
 
-    # Print the welcome message
-    def print_welcome(self):
-        print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' si vous avez besoin d'aide.")
-        print(self.player.current_room.get_long_description())
-    
+# ------------------ STDOUT REDIRECTOR ------------------
 
-def main():
-    game = Game()
-    game.play()
+class _StdoutRedirector:
+    def __init__(self,text_widget):
+        self.text_widget = text_widget
+    def write(self,text):
+        self.text_widget.configure(state="normal")
+        self.text_widget.insert("end",text)
+        self.text_widget.see("end")
+        self.text_widget.configure(state="disabled")
+    def flush(self):
+        pass
 
+# ------------------ GUI ------------------
+
+class GameGUI(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Jeu d'aventure")
+        self.geometry("800x600")
+        self.assets_dir = "assets/"
+        
+
+        self.text_area = tk.Text(self, height=20, width=60, state="disabled", bg="black", fg="white")
+        self.text_area.grid(row=0, column=0, rowspan=4, columnspan=4, padx=5, pady=5, sticky="nsew")
+
+        self.image_label = tk.Label(self)
+        self.image_label.grid(row=0, column=4, rowspan=4, padx=5, pady=5)
+
+        self.input_entry = tk.Entry(self, width=50)
+        self.input_entry.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+        self.input_entry.bind("<Return>", self.process_input)
+
+        self.send_button = tk.Button(self, text="Envoyer", command=self.process_input)
+        self.send_button.grid(row=4, column=3, padx=5, pady=5, sticky="ew")
+
+        # Boutons de déplacement
+        def create_move_buttons(self):
+            tk.Button(self, text="N", width=4, command=lambda: (self.game.process_command("go N"), self.update_room_display())).grid(row=0, column=5)
+            tk.Button(self, text="S", width=4, command=lambda: (self.game.process_command("go S"), self.update_room_display())).grid(row=2, column=5)
+            tk.Button(self, text="E", width=4, command=lambda: (self.game.process_command("go E"), self.update_room_display())).grid(row=1, column=6)
+            tk.Button(self, text="O", width=4, command=lambda: (self.game.process_command("go O"), self.update_room_display())).grid(row=1, column=5)
+
+        self.input_entry = tk.Entry(self,width=50)
+        self.input_entry.grid(row=2,column=0,columnspan=3)
+        self.input_entry.bind("<Return>",self.start_game)
+
+        self.send_button = tk.Button(self,text="Commencer",command=self.start_game)
+        self.send_button.grid(row=2,column=3)
+
+        self.name_label = tk.Label(self,text="Entrez votre nom:")
+        self.name_label.grid(row=0,column=0,columnspan=4)
+
+        self.image_label = tk.Label(self)
+        self.image_label.grid(row=1,column=4,rowspan=2)
+
+    def start_game(self,event=None):
+        player_name = self.input_entry.get().strip()
+        if not player_name:
+            return
+        self.input_entry.delete(0,"end")
+        self.name_label.destroy()
+        self.send_button.config(text="Envoyer", command=self.process_input)
+
+        self.game = Game()
+        self.game.setup(player_name)
+        sys.stdout = _StdoutRedirector(self.text_area)
+
+        self.create_move_buttons()
+        self.update_room_display()
+
+    def process_input(self,event=None):
+        command_string = self.input_entry.get()
+        self.input_entry.delete(0,"end")
+        self.game.process_command(command_string)
+        self.update_room_display()
+
+    def create_move_buttons(self):
+        tk.Button(self,text="N",command=lambda: (self.game.process_command("go N"),self.update_room_display())).grid(row=0,column=5)
+        tk.Button(self,text="S",command=lambda: (self.game.process_command("go S"),self.update_room_display())).grid(row=2,column=5)
+        tk.Button(self,text="E",command=lambda: (self.game.process_command("go E"),self.update_room_display())).grid(row=1,column=6)
+        tk.Button(self,text="O",command=lambda: (self.game.process_command("go O"),self.update_room_display())).grid(row=1,column=4)
+
+    def update_room_display(self):
+        room = self.game.player.current_room
+        print(room.get_long_description())
+
+        # Image
+        image_path = os.path.join(self.assets_dir,f"{room.name}.png")
+        if os.path.exists(image_path):
+            image = Image.open(image_path).resize((300,300))
+            self.room_image = ImageTk.PhotoImage(image)
+            self.image_label.configure(image=self.room_image)
+        else:
+            self.image_label.configure(image='')
+
+# ------------------ MAIN ------------------
 
 if __name__ == "__main__":
-    main()
-
-    
+    gui = GameGUI()
+    gui.mainloop()

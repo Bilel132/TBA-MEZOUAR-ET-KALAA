@@ -15,6 +15,8 @@
 MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 # The MSG1 variable is used when the command takes 1 parameter.
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
+from item import Beamer, Potion, Scroll, Map
+
 
 class Actions:
 
@@ -254,16 +256,91 @@ class Actions:
         room = game.player.current_room
         found = False
 
-        # Parcourir les objets Character dans le dictionnaire
-        for char in room.characters.values():  
+        for char in room.characters.values():
             if char.name.lower() == name:
-                print(f"\n{char.get_msg()}\n")
+                print(f"\n{char.get_msg()}\n")  # juste le message du PNJ
+                # Vérifier les quêtes avec le nom exact
+                game.quest_manager.check_quests(game, "talk", char.name)
                 found = True
                 break
 
         if not found:
-            print(f"\nAucun PNJ nommé '{name}' ici.\n")
+            print(f"\nAucun PNJ nommé '{args[1]}' ici.\n")
         
-        game.quest_manager.check_quests(game, "talk", name) 
         return found
 
+
+    def charge(game, args, nb_params):
+        for item in game.player.inventory.values():
+            if isinstance(item, Beamer):
+                item.charge(game.player)
+                return True
+        print("Vous n'avez pas de Beamer dans votre inventaire.")
+        return False
+
+    def fire(game, args, nb_params):
+        for item in game.player.inventory.values():
+            if isinstance(item, Beamer):
+                item.fire(game.player)
+                return True
+        print("Vous n'avez pas de Beamer dans votre inventaire.")
+        return False
+
+
+    def use(game, args, nb_params):
+        if len(args) < 2:
+            print("Précisez l'objet à utiliser.")
+            return False
+
+        item_name = args[1]
+        player = game.player
+
+        if item_name not in player.inventory:
+            print(f"L'objet '{item_name}' n'est pas dans votre inventaire.")
+            return False
+
+        item = player.inventory[item_name]
+
+        if isinstance(item, Potion):
+            item.use(player)
+            del player.inventory[item_name]  # potion consommée
+            return True
+        elif isinstance(item, Key):
+            # Ici on pourrait vérifier Door.locked si on ajoute la classe Door
+            print(f"Vous tenez la clé '{item_name}', elle peut ouvrir une porte verrouillée.")
+            return True
+        else:
+            print("Impossible d'utiliser cet objet pour le moment.")
+            return False
+
+
+
+    def read(game, args, nb_params):
+        if len(args) < 2:
+            print("Précisez le parchemin à lire.")
+            return False
+        name = args[1]
+        if name in game.player.inventory:
+            item = game.player.inventory[name]
+            if isinstance(item, Scroll):
+                item.read()
+                return True
+            else:
+                print(f"{name} n'est pas un parchemin.")
+                return False
+        else:
+            print(f"Vous n'avez pas {name} dans votre inventaire.")
+            return False
+
+
+    def map(game, args, nb_params):
+        for item in game.player.inventory.values():
+            if isinstance(item, Map):
+                item.show_map(game)
+                return True
+        print("Vous n'avez pas de carte.")
+        return False
+
+
+    
+    
