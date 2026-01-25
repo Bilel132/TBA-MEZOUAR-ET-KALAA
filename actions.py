@@ -1,39 +1,48 @@
-MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
-MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
-
 import random
 from character import Character
+from item import Map
 
 DEBUG = True  # Pour vérification PNJ mobiles
 
+MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
+MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
+
 class Actions:
 
-    # --- Déplacement ---
     def go(game, list_of_words, number_of_parameters):
         player = game.player
-        if len(list_of_words) != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG1.format(command_word=command_word))
+        if len(list_of_words) < 2:
+            print("\nPrécisez la direction ou le nom de la salle.")
             return False
 
-        direction = list_of_words[1].upper()
-        if direction not in player.current_room.exits:
-            print("\nDirection Inconnue !")
+        dest = list_of_words[1]
+
+        # Vérifie si la direction est une sortie
+        room = None
+        for key, r in player.current_room.exits.items():
+            if dest.upper() == key.upper() or dest.lower() == key.lower() or dest.lower() == r.name.lower():
+                room = r
+                break
+
+        if not room:
+            print("\nDirection ou salle inconnue !")
             return False
 
-        player.move(direction)
+        player.history.append(player.current_room)
+        player.current_room = room
+        print(f"\nVous êtes maintenant dans {room.name}\n{room.get_long_description()}")
+
+        # Valide les quêtes liées aux déplacements
         game.quest_manager.check_quests(game, "move", player.current_room.name)
 
-        # Déplacement PNJ après chaque action
-        for room in game.rooms:
-            for char in list(room.characters.values()):
+        # Déplacement des PNJ après chaque action
+        for r in game.rooms:
+            for char in list(r.characters.values()):
                 char.move()
                 if DEBUG:
                     print(f"DEBUG: {char.name} moved to {char.current_room.name}")
-
         return True
 
-    # --- Quitter ---
     def quit(game, list_of_words, number_of_parameters):
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
@@ -42,7 +51,6 @@ class Actions:
         game.finished = True
         return True
 
-    # --- Aide ---
     def help(game, list_of_words, number_of_parameters):
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
@@ -52,13 +60,11 @@ class Actions:
             print(f" - {c}")
         return True
 
-    # --- Observer ---
     def look(game, args, nb_params):
         room = game.player.current_room
         print(room.get_long_description())
         return True
 
-    # --- Prendre objet ---
     def take(game, args, nb_params):
         if len(args) < 2:
             print("Précisez l'objet à prendre.")
@@ -74,11 +80,10 @@ class Actions:
             return False
         game.player.inventory[name] = item
         del room.inventory[name]
-        print(f"Vous avez pris '{name}'.")
+        print(f"✅ Objet pris : '{name}'")
         game.quest_manager.check_quests(game, "item", name)
         return True
 
-    # --- Déposer objet ---
     def drop(game, args, nb_params):
         if len(args) < 2:
             print("Précisez l'objet à déposer.")
@@ -90,33 +95,45 @@ class Actions:
         item = game.player.inventory[name]
         game.player.current_room.inventory[name] = item
         del game.player.inventory[name]
-        print(f"Vous avez déposé '{name}'.")
+        print(f"Objet déposé : '{name}'")
         return True
 
-    # --- Inventaire ---
     def check(game, args, nb_params):
         print(game.player.get_inventory())
         return True
 
-    # --- Parler à un PNJ ---
     def talk(game, args, nb_params):
         if len(args) != 2:
             print("\nUsage : talk <nom_PNJ>\n")
             return False
+
         name = args[1].lower()
         room = game.player.current_room
         found = False
+
         for char in room.characters.values():
             if char.name.lower() == name:
                 print(f"\n{char.get_msg()}\n")
                 found = True
                 break
+
         if not found:
             print(f"Aucun PNJ nommé '{name}' ici.")
+
         game.quest_manager.check_quests(game, "talk", name)
+
+        # 🎯 Fin du jeu avec Gaara
+        if room.name == "QG Akatsuki" and name == "gaara":
+            if game.quest_manager.is_completed():
+                print("DEBUG: Victoire déclenchée")
+                game.game_gui.show_victory()
+            else:
+                print("DEBUG: Défaite déclenchée")
+                game.game_gui.show_looser()
+
         return found
 
-    # --- Utiliser objet ---
+
     def use(game, args, nb_params):
         if len(args) != 2:
             print("\nUsage : use <nom_objet>\n")
@@ -131,9 +148,17 @@ class Actions:
         else:
             print(f"'{name}' ne peut pas être utilisé.")
         game.quest_manager.check_quests(game, "use", name)
+        # Si c'est la carte, affiche la carte
+        if isinstance(item, Map) and hasattr(game.game_gui, "show_map"):
+            game.game_gui.show_map()
         return True
 
-    # --- Historique ---
+    def hide(game, args, nb_params):
+        # Spécial pour cacher la carte
+        if hasattr(game.game_gui, "hide_map"):
+            game.game_gui.hide_map()
+        return True
+
     def history(game, list_of_words, number_of_parameters):
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
@@ -141,7 +166,6 @@ class Actions:
         print(game.player.get_history())
         return True
 
-    # --- Retour arrière ---
     def back(game, list_of_words, number_of_parameters):
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))

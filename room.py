@@ -13,14 +13,17 @@ class Room:
         return self.exits.get(direction)
 
     def get_long_description(self):
-        text = f"\n📍 {self.name} — {self.description}\n"
-        text += f"Sorties: {', '.join(self.exits.keys())}\n"
+        txt = f"\n📍 {self.name} — {self.description}\n"
+        txt += "Sorties: " + ", ".join(self.exits.keys()) + "\n"
+
         if self.inventory:
-            text += "\nObjets:\n"
+            txt += "\nObjets:\n"
             for i in self.inventory.values():
-                text += f" - {i}\n"
+                txt += f" - {i}\n"
+
         if self.characters:
-            text += "\nPNJ:\n"
+            txt += "\nPNJ:\n"
             for c in self.characters.values():
-                text += f" - {c.name} : {c.description}\n"
-        return text
+                txt += f" - {c.name}\n"
+
+        return txt
