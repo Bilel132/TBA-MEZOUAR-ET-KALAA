@@ -1,5 +1,3 @@
-# item.py
-
 class Item:
     """Classe de base pour tous les objets du jeu."""
     def __init__(self, name, description, weight):
@@ -10,6 +8,7 @@ class Item:
     def __str__(self):
         return f"{self.name} : {self.description} ({self.weight} kg)"
 
+
 # ------------------ BEAMER ------------------
 class Beamer(Item):
     """Téléporteur vers une salle mémorisée."""
@@ -18,17 +17,16 @@ class Beamer(Item):
         self.saved_room = None
 
     def charge(self, player):
-        """Mémoriser la salle actuelle du joueur."""
         self.saved_room = player.current_room
         print(f"Salle mémorisée : {self.saved_room.name}")
 
     def fire(self, player):
-        """Téléporter le joueur vers la salle mémorisée."""
         if self.saved_room:
             player.current_room = self.saved_room
             print(f"Téléporté vers {self.saved_room.name}")
         else:
             print("Aucune salle mémorisée.")
+
 
 # ------------------ POTION ------------------
 class Potion(Item):
@@ -38,9 +36,9 @@ class Potion(Item):
         self.heal = heal
 
     def use(self, player, game=None):
-        """Utiliser la potion pour restaurer la santé du joueur."""
         player.health = min(player.health + self.heal, 100)
         print(f"Tu récupères {self.heal} PV. Santé actuelle : {player.health}")
+
 
 # ------------------ PARCHEMIN ------------------
 class Scroll(Item):
@@ -50,8 +48,8 @@ class Scroll(Item):
         self.content = content
 
     def use(self, player, game=None):
-        """Lire le parchemin."""
         print(f"Lecture du parchemin : {self.content}")
+
 
 # ------------------ CARTE ------------------
 class Map(Item):
@@ -60,10 +58,10 @@ class Map(Item):
         super().__init__(name, description, weight)
 
     def use(self, player, game):
-        """Afficher la carte des villages/salles disponibles."""
         print("Carte des villages :")
         for room in game.rooms:
             print(f" - {room.name}")
+
 
 # ------------------ CLE ------------------
 class Key(Item):

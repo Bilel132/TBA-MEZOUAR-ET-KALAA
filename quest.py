@@ -14,7 +14,7 @@ class Quest:
     def complete(self, obj):
         if obj in self.objectives:
             self.objectives.remove(obj)
-            print("Objectif accompli!")
+            print(f"Objectif accompli dans {self.name} !")
 
         if not self.objectives:
             self.completed = True
@@ -25,8 +25,8 @@ class QuestManager:
     def __init__(self):
         self.quests = []
 
-    def add_quest(self, q):
-        self.quests.append(q)
+    def add_quest(self, quest):
+        self.quests.append(quest)
 
     def activate_quest(self, name):
         for q in self.quests:

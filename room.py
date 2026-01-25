@@ -6,8 +6,11 @@ class Room:
         self.inventory = {}
         self.characters = {}
 
-    def get_exit(self, d):
-        return self.exits.get(d)
+    def set_exit(self, direction, room):
+        self.exits[direction] = room
+
+    def get_exit(self, direction):
+        return self.exits.get(direction)
 
     def get_long_description(self):
         text = f"\n📍 {self.name} — {self.description}\n"
@@ -21,6 +24,6 @@ class Room:
         if self.characters:
             text += "\nPNJ:\n"
             for c in self.characters.values():
-                text += f" - {c.name}\n"
+                text += f" - {c.name} : {c.description}\n"
 
         return text
