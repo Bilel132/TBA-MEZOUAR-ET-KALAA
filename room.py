@@ -15,15 +15,12 @@ class Room:
     def get_long_description(self):
         text = f"\n📍 {self.name} — {self.description}\n"
         text += f"Sorties: {', '.join(self.exits.keys())}\n"
-
         if self.inventory:
             text += "\nObjets:\n"
             for i in self.inventory.values():
                 text += f" - {i}\n"
-
         if self.characters:
             text += "\nPNJ:\n"
             for c in self.characters.values():
                 text += f" - {c.name} : {c.description}\n"
-
         return text

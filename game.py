@@ -1,8 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import os
-import sys
-
+import os, sys
 from room import Room
 from player import Player
 from command import Command
@@ -11,7 +9,7 @@ from character import Character
 from quest import Quest, QuestManager
 from item import Item
 
-# -------- REDIRECTION PRINT -> TERMINAL GUI --------
+# --- REDIRECTION PRINT ---
 class Redirect:
     def __init__(self, widget):
         self.widget = widget
@@ -23,7 +21,7 @@ class Redirect:
     def flush(self):
         pass
 
-# -------- GAME LOGIC --------
+# --- GAME LOGIC ---
 class Game:
     def __init__(self):
         self.commands = {}
@@ -33,10 +31,9 @@ class Game:
         self.finished = False
 
     def setup(self, player_name):
-        # Création du joueur
         self.player = Player(player_name)
 
-        # --- COMMANDES ---
+        # COMMANDS
         self.commands = {
             "help": Command("help"," aide",Actions.help,0),
             "go": Command("go"," déplacement",Actions.go,1),
@@ -47,36 +44,35 @@ class Game:
             "use": Command("use"," utiliser",Actions.use,1),
             "check": Command("check"," inventaire",Actions.check,0),
             "quit": Command("quit"," quitter",Actions.quit,0),
+            "back": Command("back"," revenir",Actions.back,0),
+            "history": Command("history"," historique",Actions.history,0),
         }
 
-        # --- SALLES ---
+        # ROOMS
         konoha = Room("Konohagakure","Village ninja")
         suna = Room("Sunagakure","Village du sable")
         akatsuki = Room("QG Akatsuki","Repaire ennemi")
 
-        # Exits
         konoha.exits = {"N": suna}
         suna.exits = {"S": konoha, "E": akatsuki}
         akatsuki.exits = {"O": suna}
 
-        # Items
+        # ITEMS
         konoha.inventory["kunai"] = Item("kunai","arme ninja",1)
 
-        # PNJ
+        # CHARACTERS
         Character("Naruto","Héros ninja",konoha,["Dattebayo!"])
-        Character("Sasuke","Rival ninja",konoha,["..."])
-        Character("Gaara","Kazekage",suna,["Je protège mon village."])
+        Character("Sasuke","Rival ninja",suna,["..."])
+        Character("Gaara","Kazekage",akatsuki,["Je protège mon village."])
 
+        # ROOMS LIST
         self.rooms = [konoha, suna, akatsuki]
         self.player.current_room = konoha
 
-        # Quêtes
-        self.quest_manager.add_quest(
-            Quest("Aller à Sunagakure","Voyager",["move:Sunagakure"],["XP"])
-        )
-        self.quest_manager.add_quest(
-            Quest("Prendre le Kunai","Objet",["item:kunai"],["XP"])
-        )
+        # 3 Quêtes PROF
+        self.quest_manager.add_quest(Quest("Aller à Sunagakure","Voyager",["move:Sunagakure"],["XP"]))
+        self.quest_manager.add_quest(Quest("Prendre Kunai","Objet",["item:kunai"],["XP"]))
+        self.quest_manager.add_quest(Quest("Parler à Gaara","PNJ",["talk:gaara"],["XP"]))
         self.quest_manager.activate_quest("Aller à Sunagakure")
 
     def process(self, text):
@@ -88,7 +84,7 @@ class Game:
         else:
             print("❌ Commande inconnue.")
 
-# -------- GUI --------
+# --- GUI ---
 class GameGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -116,30 +112,24 @@ class GameGUI(tk.Tk):
         self.refresh()
 
     def build_gui(self):
-        # Grid layout
         self.columnconfigure(0, weight=3)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
 
-        # Terminal Text
         self.text = tk.Text(self, bg="black", fg="white", font=("Consolas", 12), state="disabled")
         self.text.grid(row=0, column=0, rowspan=4, sticky="nsew", padx=10, pady=10)
         sys.stdout = Redirect(self.text)
 
-        # Image Panel
         self.image_label = tk.Label(self, bg="#222")
         self.image_label.grid(row=0, column=1, padx=10, pady=10)
 
-        # Entry Bar
         self.entry = tk.Entry(self, font=("Consolas", 12))
         self.entry.grid(row=4, column=0, sticky="ew", padx=10, pady=5)
         self.entry.bind("<Return>", self.send)
 
-        # Send Button
         send_btn = tk.Button(self, text="Envoyer", command=self.send)
         send_btn.grid(row=4, column=1, pady=5)
 
-        # Move Buttons
         move_frame = tk.Frame(self, bg="#222")
         move_frame.grid(row=5, column=1, pady=15)
         tk.Button(move_frame, text="↑ N", width=6, command=lambda: self.move("N")).grid(row=0, column=1)
@@ -168,6 +158,6 @@ class GameGUI(tk.Tk):
         else:
             self.image_label.config(image="")
 
-# -------- START --------
+# --- START ---
 if __name__ == "__main__":
     GameGUI().mainloop()

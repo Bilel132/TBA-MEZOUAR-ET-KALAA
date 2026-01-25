@@ -12,7 +12,6 @@ class Player:
         if not room:
             print("Pas de sortie dans cette direction.")
             return False
-        
         self.history.append(self.current_room)
         self.current_room = room
         print(f"\nVous êtes maintenant dans {room.name}\n{room.get_long_description()}")
@@ -24,7 +23,6 @@ class Player:
     def get_inventory(self):
         if not self.inventory:
             return "Inventaire vide."
-        
         txt = "Inventaire:\n"
         for i in self.inventory.values():
             txt += f" - {i}\n"

@@ -15,11 +15,9 @@ class Quest:
         if obj in self.objectives:
             self.objectives.remove(obj)
             print(f"Objectif accompli dans {self.name} !")
-
         if not self.objectives:
             self.completed = True
             print(f"Quête terminée! Récompense: {self.rewards}")
-
 
 class QuestManager:
     def __init__(self):

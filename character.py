@@ -7,16 +7,14 @@ class Character:
         self.current_room = room
         self.msgs = msgs
         self.index = 0
-        room.characters[self.name] = self  # Ajout automatique dans la salle
+        room.characters[self.name] = self
 
     def get_msg(self):
-        """Retourne le message suivant cycliquement"""
         msg = self.msgs[self.index]
         self.index = (self.index + 1) % len(self.msgs)
         return msg
 
     def move(self):
-        """Se déplace aléatoirement dans une salle adjacente (50% de chance)"""
         if not self.current_room.exits:
             return False
         if random.choice([True, False]):
