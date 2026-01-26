@@ -247,7 +247,12 @@ class GameGUI(tk.Tk):
     def show_map(self):
         """Affiche la carte du monde (méthode manquante corrigée)."""
         print("🗺️ Carte affichée (fonction GUI placeholder)")
-        # Ici tu peux ajouter une vraie image de carte si nécessaire
+        path = "assets/carte.png"
+        if os.path.exists(path):
+            img = Image.open(path).resize((420,420))
+            self.pic = ImageTk.PhotoImage(img)
+            self.image_label.config(image=self.pic)
+            self.image_label.image = self.pic
 
 
 if __name__ == "__main__":
