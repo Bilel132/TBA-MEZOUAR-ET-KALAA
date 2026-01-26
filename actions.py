@@ -1,3 +1,4 @@
+"""Module contenant la classe Actions pour gérer toutes les commandes du jeu Naruto Adventure."""
 import random
 from character import Character
 from item import Map
@@ -8,8 +9,14 @@ MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
 class Actions:
-
-    def go(game, list_of_words, number_of_parameters):
+    """Classe regroupant toutes les actions exécutables par le joueur."""
+    def __init__(self, player, quest_manager, game_gui):
+        self.player = player
+        self.quest_manager = quest_manager
+        self.game_gui = game_gui
+    
+    def go(self, game, list_of_words, number_of_parameters):
+        """Déplace le joueur dans la direction ou la salle indiquée."""
         player = game.player
         if len(list_of_words) < 2:
             print("\nPrécisez la direction ou le nom de la salle.")
@@ -43,7 +50,8 @@ class Actions:
                     print(f"DEBUG: {char.name} moved to {char.current_room.name}")
         return True
 
-    def quit(game, list_of_words, number_of_parameters):
+    def quit(self, game, list_of_words, number_of_parameters):
+        """Quitte le jeu proprement."""
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
             return False
@@ -51,7 +59,8 @@ class Actions:
         game.finished = True
         return True
 
-    def help(game, list_of_words, number_of_parameters):
+    def help(self, game, list_of_words, number_of_parameters):
+        """Affiche la liste des commandes disponibles."""
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
             return False
@@ -60,12 +69,14 @@ class Actions:
             print(f" - {c}")
         return True
 
-    def look(game, args, nb_params):
+    def look(self, game, args, nb_params):
+        """Affiche la description de la salle actuelle."""
         room = game.player.current_room
         print(room.get_long_description())
         return True
 
-    def take(game, args, nb_params):
+    def take(self, game, args, nb_params):
+        """Permet de ramasser un objet dans la salle."""
         if len(args) < 2:
             print("Précisez l'objet à prendre.")
             return False
@@ -84,7 +95,8 @@ class Actions:
         game.quest_manager.check_quests(game, "item", name)
         return True
 
-    def drop(game, args, nb_params):
+    def drop(self, game, args, nb_params):
+        """Permet de déposer un objet de l'inventaire dans la salle."""
         if len(args) < 2:
             print("Précisez l'objet à déposer.")
             return False
@@ -98,11 +110,13 @@ class Actions:
         print(f"Objet déposé : '{name}'")
         return True
 
-    def check(game, args, nb_params):
+    def check(self, game, args, nb_params):
+        """Affiche l'inventaire du joueur."""
         print(game.player.get_inventory())
         return True
 
-    def talk(game, args, nb_params):
+    def talk(self, game, args, nb_params):
+        """Permet de parler avec un PNJ dans la salle."""
         if len(args) != 2:
             print("\nUsage : talk <nom_PNJ>\n")
             return False
@@ -134,7 +148,8 @@ class Actions:
         return found
 
 
-    def use(game, args, nb_params):
+    def use(self, game, args, nb_params):
+        """Utilise un objet de l'inventaire."""
         if len(args) != 2:
             print("\nUsage : use <nom_objet>\n")
             return False
@@ -153,20 +168,23 @@ class Actions:
             game.game_gui.show_map()
         return True
 
-    def hide(game, args, nb_params):
+    def hide(self, game, args, nb_params):
+        """Cache la carte si elle est affichée."""
         # Spécial pour cacher la carte
         if hasattr(game.game_gui, "hide_map"):
             game.game_gui.hide_map()
         return True
 
-    def history(game, list_of_words, number_of_parameters):
+    def history(self, game, list_of_words, number_of_parameters):
+        """Affiche l'historique des salles visitées."""
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
             return False
         print(game.player.get_history())
         return True
 
-    def back(game, list_of_words, number_of_parameters):
+    def back(self, game, list_of_words, number_of_parameters):
+        """Retourne à la salle précédente visitée."""
         if len(list_of_words) != number_of_parameters + 1:
             print(MSG0.format(command_word=list_of_words[0]))
             return False

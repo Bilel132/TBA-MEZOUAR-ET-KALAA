@@ -1,84 +1,89 @@
-Naruto Adventure
+# Naruto Adventure – Jeu d'Aventure Textuel
 
-Naruto Adventure est un jeu d’aventure textuel avec interface graphique développé en Python, inspiré de l’univers de Naruto.
-Le joueur explore des villages ninjas, interagit avec des personnages, collecte des objets et accomplit des quêtes pouvant mener à une victoire ou une défaite.
+## Description
+**Naruto Adventure** est un jeu d’aventure textuel développé en **Python** avec une interface graphique basée sur Tkinter. Le joueur incarne un ninja dans l'univers de Naruto et explore différents villages, interagit avec des personnages, collecte des objets et accomplit des quêtes.
 
-Le projet combine programmation orientée objet, logique de jeu, inventaire, quêtes et interface graphique Tkinter.
+Ce projet est conçu pour illustrer la programmation orientée objet, la gestion des quêtes, et la création d'une interface graphique simple en Python.
 
-Concept du jeu
+## Fonctionnalités
+- Déplacement entre plusieurs salles et villages
+- Interaction avec des PNJ (personnages non-joueurs)
+- Prise et dépôt d’objets avec gestion du poids
+- Système de quêtes avec objectifs et récompenses
+- Affichage de l’inventaire et de l’historique des déplacements
+- Utilisation d’objets spéciaux (comme la carte)
+- Interface graphique avec Tkinter et affichage d’images des salles
+- Commandes textuelles complètes (`go`, `look`, `take`, `drop`, `talk`, `use`, `check`, `history`, `back`, `quit`)
 
-Le joueur incarne un ninja explorant plusieurs villages.
-Il peut se déplacer entre des salles, parler à des PNJ, récupérer des objets, accomplir des quêtes et accéder à des salles facultatives.
+## Structure du projet
+```
+TBA-MEZOUAR-ET-KALAA/
+│
+├── game.py          # Logique principale du jeu
+├── player.py        # Gestion du joueur
+├── room.py          # Définition des salles
+├── command.py       # Gestion des commandes
+├── actions.py       # Actions exécutables par le joueur
+├── character.py     # Personnages du jeu
+├── quest.py         # Gestion des quêtes
+├── item.py          # Objets du jeu (y compris carte)
+├── assets/          # Images et ressources
+├── __pycache__/     # Fichiers temporaires Python
+└── README.md        # Documentation du projet
+```
 
-Objectif principal :
-Compléter toutes les quêtes et parler à Gaara au QG de l’Akatsuki pour gagner.
+## Prérequis
+- Python 3.8 ou supérieur
+- Bibliothèques Python : `tkinter`, `Pillow`
 
-Fonctionnalités
-
-Exploration de salles interconnectées
-Salles principales et salles facultatives
-Déplacements directionnels (N, S, E, O)
-Historique des déplacements et retour arrière
-PNJ interactifs avec dialogues
-Déplacement automatique de certains PNJ
-Inventaire avec gestion du poids
-Système de quêtes dynamique
-Commandes textuelles complètes
-Interface graphique Tkinter
-Affichage d’images selon la salle
-Affichage d’une carte du monde
-Affichage d’un écran de victoire ou de défaite
-
-Commandes principales
-
-help : afficher l’aide
-go N / S / E / O : se déplacer
-look : observer la salle
-take objet : prendre un objet
-drop objet : déposer un objet
-talk pnj : parler à un personnage
-use objet : utiliser un objet
-check : afficher l’inventaire
-history : voir l’historique
-back : revenir en arrière
-hide : cacher la carte
-quit : quitter le jeu
-
-Structure du projet
-
-main.py : lancement du jeu
-game.py : logique principale et interface
-actions.py : gestion des commandes
-room.py : gestion des salles
-player.py : joueur et inventaire
-item.py : objets et carte
-character.py : personnages
-quest.py : système de quêtes
-command.py : commandes
-assets/ : images du jeu
-README.md : documentation
-
-Lancement du jeu
-
-Prérequis :
-Python 3.9 ou plus
-Pillow
-
-Installation :
+## Installation
+1. Cloner le dépôt :
+```bash
+git clone https://github.com/Bilel132/TBA-MEZOUAR-ET-KALAA.git
+```
+2. Se rendre dans le dossier du projet :
+```bash
+cd TBA-MEZOUAR-ET-KALAA
+```
+3. Installer Pillow si nécessaire :
+```bash
 pip install pillow
+```
 
-Démarrage :
-python main.py
+## Lancement du jeu
+```bash
+python game.py
+```
+- Une fenêtre s'ouvrira pour entrer le nom du joueur.
+- Utilisez les commandes textuelles ou les boutons de navigation pour interagir avec le jeu.
 
-Fins possibles
+## Commandes principales
+- `go <direction>` : se déplacer vers une salle (N, S, E, O)
+- `look` : observer la salle actuelle
+- `take <objet>` : prendre un objet
+- `drop <objet>` : déposer un objet
+- `talk <PNJ>` : parler à un personnage
+- `use <objet>` : utiliser un objet
+- `check` : afficher l'inventaire
+- `history` : afficher l'historique des salles visitées
+- `back` : revenir à la salle précédente
+- `quit` : quitter le jeu
 
-Fin gagnante :
-Toutes les quêtes terminées
-Arriver au QG Akatsuki
-Parler à Gaara
-Affichage de winner.jpg
+## Objectifs pédagogiques
+- Apprendre la programmation orientée objet en Python
+- Créer un moteur de jeu textuel simple
+- Implémenter des systèmes de commandes et de quêtes
+- Utiliser Tkinter pour l'interface graphique
 
-Fin perdante :
-Quêtes incomplètes
-Parler à Gaara trop tôt
-Affichage de looser.jpg
+## Améliorations possibles
+- Ajouter des combats ou compétences ninja
+- Ajouter plus de PNJ et dialogues interactifs
+- Système d’inventaire avancé
+- Sauvegarde et chargement de partie
+- Événements aléatoires ou mini-quêtes
+
+## Auteurs
+Projet réalisé par **MEZOUAR** et **KALAA**.
+
+## Licence
+Projet à but éducatif, sans licence spécifique définie.
