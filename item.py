@@ -30,3 +30,4 @@ class Map(Item):
         for q in game.quest_manager.quests:
             if q.active and not q.completed:
                 print(f" - {q.name}")
+                

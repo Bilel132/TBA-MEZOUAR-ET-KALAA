@@ -43,3 +43,4 @@ class QuestManager:
     def is_completed(self):
         """Retourne True si toutes les quêtes sont terminées."""
         return all(q.completed for q in self.quests)
+    

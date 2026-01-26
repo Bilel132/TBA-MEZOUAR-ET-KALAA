@@ -12,3 +12,4 @@ class Command:
     def execute(self, game, args):
         """Exécute la commande avec les arguments fournis."""
         self.action(game, args, self.number_of_parameters)
+        

@@ -23,3 +23,4 @@ class Player:
     def get_history(self):
         """Retourne l'historique des salles visitées."""
         return " → ".join(r.name for r in self.history) if self.history else "Vide"
+    

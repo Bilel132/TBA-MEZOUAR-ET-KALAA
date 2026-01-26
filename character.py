@@ -30,3 +30,4 @@ class Character:
             self.current_room.characters[self.name] = self
             return True
         return False
+    
